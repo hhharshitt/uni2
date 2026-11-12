@@ -1,0 +1,202 @@
+/* ======================================================
+   ROLE BADGES
+   ====================================================== */
+.role-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.role-badge::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%; background: currentColor; opacity: 0.75; flex-shrink: 0;
+}
+
+.role-badge.student { background:#F0FDF4; color:#15803D; border:1px solid #BBF7D0; }
+.role-badge.driver  { background:#FFF7ED; color:#C2410C; border:1px solid #FED7AA; }
+.role-badge.admin   { background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA; }
+
+/* ======================================================
+   ROLE SELECTION — Signup
+   ====================================================== */
+.role-selection {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.85rem; margin-bottom: 1.1rem;
+}
+
+.role-option { cursor: pointer; }
+.role-option input[type="radio"] { display: none; }
+
+.role-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 1.4rem 1rem;
+  text-align: center; background: var(--bg);
+  transition: all 0.18s var(--spring);
+}
+
+.role-card:hover {
+  border-color: rgba(255,92,0,0.4); background: white;
+  box-shadow: var(--shadow-sm); transform: translateY(-2px);
+}
+
+.role-option input:checked + .role-card {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  box-shadow: 0 0 0 3px rgba(255,92,0,0.12);
+}
+
+.role-icon { font-size: 2rem; display: block; margin-bottom: 0.6rem; transition: transform 0.25s var(--spring); }
+.role-card:hover .role-icon { transform: scale(1.15) rotate(-5deg); }
+
+.role-card strong { display:block; margin-bottom:0.15rem; font-size:0.95rem; color:var(--tx1); font-weight:700; }
+.role-card small  { color:var(--tx2); font-size:0.78rem; }
+
+/* ======================================================
+   ADMIN BADGE
+   ====================================================== */
+.admin-badge {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: #FEF2F2; color: #B91C1C;
+  border: 1px solid #FECACA;
+  padding: 0.35rem 1rem; border-radius: 9999px;
+  font-weight: 700; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.admin-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #EF4444; animation: liveBlink 1.8s ease-in-out infinite;
+}
+
+@keyframes liveBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ======================================================
+   ADMIN QUICK ACTIONS
+   ====================================================== */
+.admin-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem; margin-top: 0.75rem;
+}
+
+/* ======================================================
+   ADMIN FILTERS
+   ====================================================== */
+.admin-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem; margin-bottom: 1rem;
+}
+
+.admin-filters input,
+.admin-filters select {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid var(--border); border-radius: var(--r-md);
+  font-size: 0.88rem; font-family: inherit;
+  background: var(--bg); color: var(--tx1);
+  transition: all 0.15s; outline: none;
+}
+
+.admin-filters input:focus,
+.admin-filters select:focus {
+  border-color: var(--brand); background: white;
+  box-shadow: 0 0 0 4px var(--brand-glow);
+}
+
+/* ======================================================
+   ADMIN CARDS
+   ====================================================== */
+.admin-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--r-xl); padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s var(--smooth);
+  position: relative; overflow: hidden;
+}
+
+.admin-card::before {
+  content: '';
+  position: absolute; top:0; left:0;
+  width: 3px; height: 100%;
+  background: linear-gradient(135deg, #FF6B1A, var(--brand));
+  opacity: 0; transition: opacity 0.2s;
+}
+
+.admin-card:hover { box-shadow: var(--shadow-sm); border-color: var(--border-dark); }
+.admin-card:hover::before { opacity: 1; }
+
+.admin-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.85rem; }
+.admin-card-header h3 { font-size:1rem; font-weight:700; color:var(--tx1); letter-spacing:-0.02em; }
+.admin-card-header p  { color:var(--tx2); font-size:0.85rem; margin-bottom:0.3rem; }
+
+.admin-card-actions { display:flex; gap:0.45rem; flex-wrap:wrap; }
+
+/* ======================================================
+   DANGER BUTTON
+   ====================================================== */
+.btn-danger {
+  background: linear-gradient(135deg, #F87171, #EF4444);
+  color: white; border: none;
+  padding: 0.45rem 0.9rem; border-radius: var(--r-sm);
+  cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  transition: all 0.15s;
+}
+.btn-danger:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,0.25); }
+
+/* ======================================================
+   STAT ACCENTS (kept for backward compat with JS)
+   ====================================================== */
+.stat-primary { /* gradient set in style.css */ }
+.stat-success { /* gradient set in style.css */ }
+.stat-warning { /* gradient set in style.css */ }
+.stat-info    { /* gradient set in style.css */ }
+
+/* ======================================================
+   ACTIVITY FEED — Timeline
+   ====================================================== */
+.activity-item {
+  display: flex; gap: 0.85rem; padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border); align-items: flex-start;
+}
+.activity-item:last-child { border-bottom: none; }
+
+.activity-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--brand); flex-shrink: 0; margin-top: 5px;
+  box-shadow: 0 0 0 3px rgba(255,92,0,0.14);
+}
+
+.activity-content { flex: 1; }
+.activity-item p     { margin-bottom: 0.15rem; font-size: 0.88rem; color: var(--tx1); font-weight: 500; }
+.activity-item small { color: var(--tx3); font-size: 0.78rem; }
+
+/* ======================================================
+   PROFILE AVATAR
+   ====================================================== */
+.profile-avatar {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, var(--brand-light) 0%, #FFE0D0 100%);
+  border-radius: var(--r-xl);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.25rem; border: 2px solid var(--border);
+  box-shadow: 0 4px 16px rgba(255,92,0,0.1);
+}
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+@media (max-width: 768px) {
+  .role-selection  { grid-template-columns: 1fr !important; }
+  .admin-filters   { grid-template-columns: 1fr !important; }
+  .admin-card-header { flex-direction: column; gap: 0.6rem; }
+  .admin-card-actions { width: 100%; }
+  .admin-actions   { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .admin-actions { grid-template-columns: 1fr !important; }
+}

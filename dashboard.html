@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Uniride Dashboard — Find rides, post carpools, and track live journeys.">
+    <title>Dashboard — Uniride</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-fluid" id="dashNav">
+        <div class="container">
+            <div style="display:flex;align-items:center;">
+                <div class="nav-brand">🚗 Uni<span>ride</span></div>
+                <span class="nav-campus-badge">🏫 MUJ Campus</span>
+            </div>
+            <div class="nav-menu">
+                <span id="userGreeting" style="font-weight:600;font-size:0.86rem;color:var(--tx2);">Welcome!</span>
+                <span id="userRoleBadge" class="role-badge"></span>
+                <button id="logoutBtn" class="btn-secondary btn-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-text">🚗 Uni<span>ride</span></div>
+                <div class="sidebar-campus-tag">🏫 MUJ Campus Hub</div>
+            </div>
+            <div class="sidebar-label">Navigation</div>
+            <div class="sidebar-menu" id="sidebarMenu">
+                <!-- Will be populated based on role -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Section -->
+            <section id="homeSection" class="content-section active">
+                <h2>Dashboard</h2>
+
+                <!-- Live Ride tracking & Campus Map Card -->
+                <div class="card active-ride-card" id="activeRideMapCard" style="display: block; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <h3 style="margin: 0; font-size:1rem;" id="liveMapTitle">🗺️ Campus Live Map</h3>
+                            <span class="live-indicator" id="liveMapBadge">
+                                <span class="live-dot"></span>
+                                Live
+                            </span>
+                        </div>
+                        <!-- Simulation controls visible when tracking an active ride -->
+                        <div class="sim-speed-controls" id="map-simulation-controls" style="display: none;">
+                            <span style="font-size: 0.8rem; color: var(--tx3); margin-right: 0.35rem;">Sim:</span>
+                            <button onclick="setSimulationSpeed(1)">1×</button>
+                            <button onclick="setSimulationSpeed(5)">5×</button>
+                            <button onclick="setSimulationSpeed(10)">10×</button>
+                            <button onclick="setSimulationSpeed(50)">50×</button>
+                        </div>
+                    </div>
+                    <!-- Quick-jump hotspot pills -->
+                    <div class="map-hotspot-pills" id="mapHotspotPills">
+                        <button class="hotspot-pill active" onclick="jumpToHotspot('muj')">🏫 MUJ Campus</button>
+                        <button class="hotspot-pill" onclick="jumpToHotspot('civillines')">🏙️ Civil Lines</button>
+                        <button class="hotspot-pill" onclick="jumpToHotspot('station')">🚆 Railway Station</button>
+                        <button class="hotspot-pill" onclick="jumpToHotspot('airport')">✈️ Airport</button>
+                        <button class="hotspot-pill" onclick="jumpToHotspot('vaishali')">🛍️ Vaishali Nagar</button>
+                    </div>
+                    <div class="map-wrapper" style="position: relative;">
+                        <div id="liveMap" style="width: 100%; height: 380px; border-radius: 10px; background: #ede9e0; overflow: hidden;"></div>
+                        <div id="mapOverlayInfo" class="map-overlay-card" style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(255,255,255,0.94); padding: 0.8rem 1.1rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(20,20,19,0.10); backdrop-filter: blur(10px); border: 1px solid rgba(224,219,208,0.8); z-index: 1000;">
+                            <div id="rideInfoContent" style="font-size:0.86rem;color:var(--tx1);">📍 Campus Live Map · Showing active carpools & student transit across Jaipur</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats (All Roles) -->
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- Quick Actions (Role-based) -->
+                <div class="card" id="quickActionsCard">
+                    <h3 style="font-size:0.95rem;margin-bottom:1rem;">⚡ Quick Actions</h3>
+                    <div id="quickActions"></div>
+                </div>
+
+                <!-- Recent Content -->
+                <div class="card">
+                    <h3 id="recentTitle" style="font-size:0.95rem;margin-bottom:1rem;">Recent Activity</h3>
+                    <div id="recentContent"></div>
+                </div>
+            </section>
+
+            <!-- Search Section (Student Only) -->
+            <section id="searchSection" class="content-section">
+                <h2>🔍 Search Rides</h2>
+                <div class="card search-card">
+                    <div class="search-header">
+                        <h3>Find Your Perfect Ride</h3>
+                        <p class="search-subtitle">Travel together, split costs, make friends</p>
+                    </div>
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Destination</label>
+                            <div class="autocomplete-wrapper search-input-wrapper">
+                                <span class="input-icon">📍</span>
+                                <input type="text" id="searchDestination" placeholder="Where are you going?" required>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Travel Date</label>
+                            <div class="search-input-wrapper">
+                                <span class="input-icon">📅</span>
+                                <input type="date" id="searchDate" required>
+                            </div>
+                        </div>
+                        <div class="filter-group button-group">
+                            <button class="btn-primary search-btn" id="searchRidesBtn">
+                                <span>🔍</span> Search Rides
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="searchResults">
+                    <div class="search-placeholder-state">
+                        <div class="placeholder-icon">🚗</div>
+                        <h3>Ready to Ride?</h3>
+                        <p>Search for your destination and date above to see available carpools on campus.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Post Ride Section (Student & Driver) -->
+            <section id="postSection" class="content-section">
+                <h2>🚗 Post a Ride</h2>
+                <div class="card">
+                    <form id="postRideForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>From</label>
+                                <input type="text" id="rideFrom" placeholder="e.g., Campus Hostel A" required>
+                            </div>
+                            <div class="form-group">
+                                <label>To</label>
+                                <input type="text" id="rideTo" placeholder="e.g., Railway Station" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="rideDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Time</label>
+                                <input type="time" id="rideTime" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Available Seats</label>
+                                <input type="number" id="rideSeats" min="1" max="6" placeholder="1–6" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Fare (₹)</label>
+                                <input type="number" id="rideFare" min="1" placeholder="e.g., 200" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Vehicle Info (Optional)</label>
+                            <input type="text" id="rideVehicle" placeholder="e.g., White Honda City, DL01AB1234">
+                        </div>
+                        <div class="fare-preview">
+                            <strong>Cost per person: <span id="farePreview">₹0</span></strong>
+                            <small>Based on seats available and total fare entered above</small>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">🚀 Post Ride</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- My Rides Section (All Roles) -->
+            <section id="myridesSection" class="content-section">
+                <h2>📋 My Rides</h2>
+
+                <!-- Tabs (Role-based) -->
+                <div class="tabs" id="myRidesTabs">
+                    <!-- Will be populated based on role -->
+                </div>
+
+                <!-- Tab Contents -->
+                <div id="bookingsTab" class="tab-content">
+                    <div id="myBookingsList"></div>
+                </div>
+
+                <div id="driverTab" class="tab-content">
+                    <div id="driverRidesList"></div>
+                </div>
+            </section>
+
+            <!-- Profile Section (All Roles) -->
+            <section id="profileSection" class="content-section">
+                <h2>👤 My Profile</h2>
+                <div class="card">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <span id="profileAvatar">👤</span>
+                        </div>
+                        <div class="profile-details">
+                            <h3 id="profileName">Loading...</h3>
+                            <p id="profileEmail" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.35rem;">email@college.edu</p>
+                            <span id="profileRoleBadge" class="role-badge"></span>
+                            <div class="profile-stats">
+                                <span>⭐ <strong id="profileRating">5.0</strong> rating</span>
+                                <span>🚗 <strong id="profileRides">0</strong> posted</span>
+                                <span>✓ <strong id="profileCompleted">0</strong> completed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+                    <div class="profile-fields">
+                        <div class="field">
+                            <label>Phone</label>
+                            <span id="profilePhone">—</span>
+                        </div>
+                        <div class="field">
+                            <label>College ID</label>
+                            <span id="profileCollegeId">—</span>
+                        </div>
+                        <div class="field">
+                            <label>Branch</label>
+                            <span id="profileBranch">—</span>
+                        </div>
+                        <div class="field">
+                            <label>Year</label>
+                            <span id="profileYear">—</span>
+                        </div>
+                        <div class="field" id="vehicleField" style="display:none;">
+                            <label>Vehicle</label>
+                            <span id="profileVehicle">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Posted Rides Card in Profile -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <h3 style="margin: 0;">🚗 My Posted Rides</h3>
+                        <span id="profilePostedBadge" style="background: var(--brand-light); color: var(--brand); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">0 Rides</span>
+                    </div>
+                    <div id="profilePostedRidesList">
+                        <div class="loading">Loading your posted rides...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- UNIRIDE COPILOT POP-OUT CHAT WIDGET (Image 2) -->
+    <!-- ====================================================== -->
+    <div class="uniride-chat-popup hidden dark-theme" id="unirideChatPopup" role="dialog" aria-labelledby="chatPopupTitle" aria-modal="true">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="header-left">
+                <div class="header-brand-avatar">🤖</div>
+                <div class="bot-info">
+                    <h3 id="chatPopupTitle">UniRide CoPilot</h3>
+                    <div class="status-indicator">
+                        <span class="status-dot pulsing" id="popupStatusDot"></span>
+                        <span class="status-text" id="engineStatusText">Mock Mode active</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="toggleShortcutsBtn" title="Quick Shortcuts & FAQ">
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+                <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+                <button class="icon-btn" id="clearChatBtn" title="Clear Conversation">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button class="icon-btn" id="maximizeChatBtn" title="Toggle Expand">
+                    <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                </button>
+                <button class="icon-btn" id="minimizeChatBtn" title="Minimize">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="icon-btn close-btn" id="closeChatBtn" title="Close Chat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Slide-down Quick Shortcuts & Config Drawer -->
+        <div class="chat-shortcuts-drawer" id="chatShortcutsDrawer">
+            <div class="shortcuts-drawer-header">
+                <span class="shortcuts-drawer-title"><i class="fa-solid fa-bolt"></i> Quick Shortcuts</span>
+                <button class="shortcuts-close-btn" id="closeShortcutsDrawerBtn" title="Close Panel">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="shortcuts-drawer-grid">
+                <button class="drawer-shortcut-btn" onclick="triggerQuickQuery('How do I verify my student account?')">
+                    <i class="fa-solid fa-graduation-cap"></i> Student Verification
+                </button>
+                <button class="drawer-shortcut-btn" onclick="triggerQuickQuery('How does the automatic fare splitter work?')">
+                    <i class="fa-solid fa-wallet"></i> Fare Splitting Logic
+                </button>
+                <button class="drawer-shortcut-btn" onclick="triggerQuickQuery('Search for available rides today')">
+                    <i class="fa-solid fa-route"></i> Find Rides
+                </button>
+                <button class="drawer-shortcut-btn" onclick="triggerQuickQuery('How can I post a ride as a driver?')">
+                    <i class="fa-solid fa-car"></i> Post a Ride
+                </button>
+            </div>
+            <div class="shortcuts-drawer-gemini">
+                <label for="geminiApiKey"><i class="fa-solid fa-key"></i> Gemini AI API Key (Optional)</label>
+                <div class="api-key-input-wrapper">
+                    <input type="password" id="geminiApiKey" placeholder="AIzaSy... (Leave blank for Mock Mode)" autocomplete="off">
+                    <button class="icon-btn toggle-password-btn" id="toggleApiKeyVisibility" title="Toggle visibility">
+                        <i class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+                <p class="settings-hint">Stored locally in your browser. If not provided, CoPilot runs in intelligent Mock Mode.</p>
+            </div>
+        </div>
+
+        <!-- Messages Thread -->
+        <div class="messages-container" id="messagesContainer">
+            <!-- Populated dynamically -->
+        </div>
+
+        <!-- Suggestion Tags Row -->
+        <div class="suggestion-row-wrapper">
+            <div class="suggestion-row" id="suggestionRow">
+                <button class="suggestion-tag" onclick="triggerQuickQuery('Show active rides')">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Show active rides
+                </button>
+                <button class="suggestion-tag" onclick="triggerQuickQuery('Fare Split Calculator')">
+                    <i class="fa-solid fa-calculator"></i> Fare Split Calculator
+                </button>
+                <button class="suggestion-tag" onclick="triggerQuickQuery('Check my verification status')">
+                    <i class="fa-solid fa-shield-check"></i> Check verification status
+                </button>
+                <button class="suggestion-tag" onclick="triggerQuickQuery('Help me get started')">
+                    <i class="fa-solid fa-circle-info"></i> Help me get started
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Input Footer -->
+        <footer class="chat-footer">
+            <form class="input-form" id="chatInputForm">
+                <input type="text" id="userInputField" placeholder="Ask UniRide CoPilot anything..." autocomplete="off" required>
+                <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+            </form>
+        </footer>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App & Dashboard Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/mapsn.js"></script>
+    <script src="js/dashboard-roles.js"></script>
+
+    <!-- Chatbot Scripts -->
+    <script src="js/chatbot-mock.js"></script>
+    <script src="js/chatbot-gemini.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <script>
+        // Sticky nav scroll effect
+        const nav = document.getElementById('dashNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+    </script>
+</body>
+</html>

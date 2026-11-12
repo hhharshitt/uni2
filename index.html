@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Uniride — Smart carpooling for college students in Jaipur, Rajasthan. Share rides with verified peers, save money, reduce emissions.">
+  <meta name="keywords" content="Uniride, carpooling, Jaipur, students, MUJ, Manipal Jaipur, ride sharing">
+  <title>Uniride — Smart Rides for Jaipur Students</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS (for Jaipur map preview) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ─── LANDING PAGE EXTRA STYLES ─────────────────────── */
+
+    /* Floating particles canvas */
+    #particles-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── HERO ENHANCEMENTS ─── */
+    .hero {
+      background: linear-gradient(160deg, #141413 0%, #1c1b19 50%, #1a1917 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .hero .container {
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+    }
+
+    .hero::before {
+      background-image: radial-gradient(rgba(250,249,245,0.04) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* Glowing blobs */
+    .hero-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-blob-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(217,119,87,0.18) 0%, transparent 60%);
+      top: -120px; right: -100px;
+    }
+    .hero-blob-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(106,155,204,0.12) 0%, transparent 65%);
+      bottom: -60px; left: -60px;
+    }
+    .hero-blob-3 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(120,140,93,0.10) 0%, transparent 65%);
+      top: 40%; right: 20%;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(217, 119, 87, 0.13);
+      border: 1px solid rgba(217, 119, 87, 0.3);
+      border-radius: 100px;
+      padding: 0.38rem 1.1rem;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #e8956a;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 1.75rem;
+      animation: fadeUp 0.5s 0.1s both;
+    }
+    .hero-eyebrow .pulse-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #d97757;
+      animation: liveBlink 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .hero h1 {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1.04;
+      letter-spacing: -0.05em;
+      color: #faf9f5;
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.55s 0.2s both;
+    }
+
+    .hero h1 .line2 {
+      display: block;
+    }
+
+    .hero h1 .highlight {
+      position: relative;
+      background: linear-gradient(135deg, #e8956a 0%, #d97757 50%, #c05c3d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .subtitle {
+      font-size: 1.08rem;
+      color: rgba(250, 249, 245, 0.58);
+      line-height: 1.82;
+      max-width: 500px;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.55s 0.3s both;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.55s 0.4s both;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.95rem 2rem;
+      background: linear-gradient(135deg, #e88660 0%, #d97757 60%, #c05c3d 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      font-family: 'Plus Jakarta Sans', inherit;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #884030, 0 12px 32px rgba(217, 119, 87, 0.42);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 0 #884030, 0 20px 48px rgba(217, 119, 87, 0.52);
+    }
+    .btn-hero-primary:active { transform: translateY(1px); }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.75rem;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+    }
+    .btn-hero-secondary:hover {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.28);
+      transform: translateY(-2px);
+    }
+
+    /* Hero stats */
+    .hero-stats {
+      display: flex;
+      gap: 0;
+      margin-top: 3.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp 0.55s 0.5s both;
+    }
+
+    .hero-stat-item {
+      flex: 1;
+      padding: 1.1rem 1.5rem;
+      position: relative;
+      text-align: left;
+    }
+    .hero-stat-item + .hero-stat-item {
+      border-left: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .hero-stat-item .stat-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .hero-stat-item .stat-label {
+      font-size: 0.72rem;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    /* ─── HERO RIGHT PANEL (Map Preview Card) ─── */
+    .hero-visual {
+      animation: fadeUp 0.6s 0.3s both;
+    }
+
+    .map-preview-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    .map-card-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .map-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .map-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 100px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #34D399;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .map-live-badge .live-dot-sm {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: liveBlink 1.4s infinite;
+    }
+
+    .map-area-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+    }
+
+    #hero-map {
+      width: 100%;
+      height: 280px;
+      display: block;
+      border: none;
+    }
+
+    .map-rides-overlay {
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .mini-ride-pill {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 0.7rem 0.9rem;
+      transition: all 0.2s ease;
+    }
+    .mini-ride-pill:hover {
+      background: rgba(255, 92, 0, 0.12);
+      border-color: rgba(255, 92, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    .mini-ride-pill .pill-route {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0.25rem;
+    }
+    .mini-ride-pill .pill-meta {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .mini-ride-pill .pill-price {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #FF8F5E;
+      margin-top: 0.2rem;
+    }
+
+    /* ─── SECTION COMMON ─── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--brand-light);
+      color: var(--brand);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.9rem;
+      border-radius: 100px;
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--tx1);
+      line-height: 1.15;
+      margin-bottom: 0.85rem;
+    }
+
+    .section-subheading {
+      color: var(--tx2);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 520px;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-it-works {
+      padding: 7rem 0;
+      background: #0F172A;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how-it-works::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .how-it-works .section-label {
+      background: rgba(255, 92, 0, 0.12);
+      color: #FF8F5E;
+      border: 1px solid rgba(255, 92, 0, 0.2);
+    }
+
+    .how-it-works .section-heading { color: white; }
+    .how-it-works .section-subheading { color: rgba(148, 163, 184, 0.85); }
+
+    .how-it-works .section-intro {
+      margin-bottom: 4rem;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    /* Connector line */
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 52px;
+      left: calc(16.66% + 40px);
+      right: calc(16.66% + 40px);
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,92,0,0.5), rgba(79,110,247,0.5), rgba(16,185,129,0.5));
+      border-radius: 2px;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .step-card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,92,0,0.3);
+      transform: translateY(-8px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+
+    .step-number-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px; height: 64px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .step-number-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      opacity: 0.2;
+    }
+
+    .step-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      position: relative;
+      z-index: 1;
+      border: 2px solid rgba(255,255,255,0.12);
+    }
+
+    .step-card:nth-child(1) .step-icon { background: linear-gradient(135deg, rgba(255,92,0,0.25), rgba(255,92,0,0.1)); border-color: rgba(255,92,0,0.3); }
+    .step-card:nth-child(2) .step-icon { background: linear-gradient(135deg, rgba(79,110,247,0.25), rgba(79,110,247,0.1)); border-color: rgba(79,110,247,0.3); }
+    .step-card:nth-child(3) .step-icon { background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.1)); border-color: rgba(16,185,129,0.3); }
+
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .step-card p {
+      color: rgba(148, 163, 184, 0.8);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .step-badge {
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #FF7A3A, #FF5C00);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+    }
+
+    /* ─── FEATURES ─── */
+    .features {
+      padding: 7rem 0;
+      background: white;
+    }
+
+    .features-intro {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .features-intro .section-label { margin: 0 auto 1rem; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: #F8FAFC;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      transition: all 0.3s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,92,0,0.04), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover {
+      background: white;
+      border-color: rgba(255,92,0,0.3);
+      box-shadow: 0 16px 48px rgba(255,92,0,0.1);
+      transform: translateY(-8px);
+    }
+
+    .feature-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      margin-bottom: 1.25rem;
+      transition: transform 0.35s var(--spring);
+    }
+    .feature-card:hover .feature-icon-wrap { transform: scale(1.12) rotate(-8deg); }
+
+    .fi-orange { background: linear-gradient(135deg, #FFF0E8, #FFD5B8); }
+    .fi-blue   { background: linear-gradient(135deg, #EEF2FF, #DBEAFE); }
+    .fi-green  { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); }
+    .fi-purple { background: linear-gradient(135deg, #F5F3FF, #E9D5FF); }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--tx1);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+    .feature-card p {
+      color: var(--tx2);
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+
+    /* ─── MAP SECTION ─── */
+    .map-section {
+      padding: 7rem 0;
+      background: var(--bg);
+    }
+
+    .map-section-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .map-section-text .section-heading { font-size: 2.2rem; }
+
+    .map-highlights {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .map-highlight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.9rem 1.1rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+    }
+    .map-highlight-item:hover {
+      border-color: var(--brand);
+      box-shadow: 0 4px 20px rgba(255,92,0,0.1);
+      transform: translateX(4px);
+    }
+
+    .mhi-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .mhi-content h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--tx1);
+      margin-bottom: 0.15rem;
+    }
+    .mhi-content p {
+      font-size: 0.8rem;
+      color: var(--tx2);
+      line-height: 1.5;
+    }
+
+    .main-map-wrapper {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .map-header-bar {
+      background: white;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .map-header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--tx1);
+    }
+
+    #jaipur-preview-map {
+      width: 100%;
+      height: 380px;
+    }
+
+    .map-footer-bar {
+      background: white;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .map-stat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--tx1);
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonials {
+      padding: 7rem 0;
+      background: white;
+    }
+
+    .testimonials-intro {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .testimonials-intro .section-label { margin: 0 auto 1rem; }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .testimonial-card {
+      background: #F8FAFC;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+    }
+    .testimonial-card:hover {
+      background: white;
+      border-color: var(--brand);
+      box-shadow: 0 12px 40px rgba(255,92,0,0.1);
+      transform: translateY(-4px);
+    }
+
+    .testimonial-stars {
+      color: #F59E0B;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .testimonial-text {
+      font-size: 0.92rem;
+      color: var(--tx1);
+      line-height: 1.75;
+      font-style: italic;
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+    .testimonial-text::before {
+      content: '"';
+      font-size: 3rem;
+      color: rgba(255,92,0,0.15);
+      font-family: Georgia, serif;
+      position: absolute;
+      top: -20px;
+      left: -8px;
+      line-height: 1;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .author-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--tx1);
+    }
+    .author-meta {
+      font-size: 0.75rem;
+      color: var(--tx2);
+    }
+
+    /* ─── CTA SECTION ─── */
+    .cta-section {
+      padding: 7rem 0;
+      background: linear-gradient(145deg, #070D1C, #0F172A, #0A1F3D);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .cta-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .cta-blob-1 {
+      width: 600px; height: 500px;
+      background: radial-gradient(circle, rgba(255,92,0,0.18) 0%, transparent 65%);
+      top: -150px; left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .cta-section .section-heading {
+      color: white;
+      font-size: 3rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-section .section-subheading {
+      color: rgba(148, 163, 184, 0.85);
+      margin: 0 auto 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-trust {
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: rgba(100, 116, 139, 0.8);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      background: #070D1C;
+      padding: 3rem 0 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .footer-brand-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.75rem;
+    }
+    .footer-brand-name span { color: var(--brand); }
+
+    .footer-desc {
+      color: rgba(148, 163, 184, 0.6);
+      font-size: 0.875rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 1.1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .footer-links a {
+      color: rgba(148, 163, 184, 0.65);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: white; }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-bottom-left {
+      font-size: 0.8rem;
+      color: rgba(100, 116, 139, 0.7);
+    }
+
+    .footer-bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: rgba(100, 116, 139, 0.7);
+    }
+
+    .footer-india-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255,153,51,0.1);
+      border: 1px solid rgba(255,153,51,0.2);
+      border-radius: 100px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #FF9933;
+    }
+
+    /* ─── NAV (override) ─── */
+    .navbar {
+      background: rgba(7,13,28,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .navbar.scrolled {
+      background: rgba(7,13,28,0.95);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    .nav-brand {
+      color: white;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-weight: 700;
+    }
+    .nav-brand span { color: var(--brand); }
+
+    .nav-menu a { color: rgba(148,163,184,0.85); }
+    .nav-menu a:hover { color: white; background: rgba(255,255,255,0.06); }
+    .nav-menu a.btn-hero-primary { color: white !important; padding: 0.45rem 1.1rem; }
+
+    /* ─── MODALS UPGRADE ─── */
+    .modal-content {
+      background: white;
+    }
+
+    .modal-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--tx1);
+      margin-bottom: 1.75rem;
+      font-family: 'Space Grotesk', inherit;
+    }
+    .modal-logo span { color: var(--brand); }
+
+    /* Role cards upgrade */
+    .role-selection {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .role-option input { display: none; }
+
+    .role-card {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg);
+    }
+
+    .role-option input:checked + .role-card {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 4px var(--brand-glow);
+    }
+
+    .role-card:hover {
+      border-color: var(--brand-dark);
+      background: var(--brand-light);
+    }
+
+    .role-card .role-icon { font-size: 1.75rem; display: block; margin-bottom: 0.4rem; }
+    .role-card strong { font-size: 0.88rem; font-weight: 700; display: block; color: var(--tx1); }
+    .role-card small { font-size: 0.72rem; color: var(--tx2); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .hero h1 { font-size: 3.5rem; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      .map-section-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-visual { display: block; width: 100%; margin-top: 1.5rem; }
+      #hero-map { height: 250px; }
+      .hero h1 { font-size: 2.8rem; }
+      .hero-stats { flex-direction: column; }
+      .hero-stat-item + .hero-stat-item { border-left: none; border-top: 1px solid rgba(255,255,255,0.07); }
+      .steps-grid { grid-template-columns: 1fr; }
+      .steps-grid::before { display: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .section-heading { font-size: 2rem; }
+      .cta-section .section-heading { font-size: 2.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 2.2rem; }
+      .hero-cta-row { flex-direction: column; }
+      .btn-hero-primary, .btn-hero-secondary { justify-content: center; }
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Safety: if JS hasn't fired after page load, reveal items anyway */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar" id="mainNav">
+  <div class="container">
+    <div class="nav-brand">🚗 Uni<span>ride</span></div>
+    <div class="nav-menu">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#map-section">Coverage</a>
+      <a href="#" id="loginBtn">Login</a>
+      <a href="#" id="signupBtn" class="btn-hero-primary" style="font-size:0.875rem;padding:0.5rem 1.1rem;border-radius:10px;box-shadow:none;">Get Started →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+
+  <div class="container">
+    <div class="hero-grid">
+      <!-- Left Content -->
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="pulse-dot"></span>
+          Live in Jaipur, Rajasthan 🏰
+        </div>
+
+        <h1>
+          Ride Smarter,
+          <span class="line2"><span class="highlight">Together.</span></span>
+        </h1>
+
+        <p class="subtitle">
+          The carpooling platform built for Jaipur's college students. Connect with verified peers from MUJ, JECRC, Poornima &amp; more — split costs, reduce traffic, travel safe.
+        </p>
+
+        <div class="hero-cta-row">
+          <button class="btn-hero-primary" id="getStartedBtn">
+            Get Started Free →
+          </button>
+          <button class="btn-hero-secondary" id="learnMoreBtn">
+            <span>▶</span> See How It Works
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat-item">
+            <div class="stat-val">500+</div>
+            <div class="stat-label">Active Riders</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="stat-val">₹120</div>
+            <div class="stat-label">Avg. Saved / Ride</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="stat-val">4.9★</div>
+            <div class="stat-label">Student Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right — Map Preview Card -->
+      <div class="hero-visual">
+        <div class="map-preview-card">
+          <div class="map-card-header">
+            <div class="map-card-header-left">
+              <div class="map-live-badge">
+                <span class="live-dot-sm"></span> Live
+              </div>
+              <div class="map-area-label">Jaipur, Rajasthan</div>
+            </div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">🚗 4 rides nearby</div>
+          </div>
+          <div id="hero-map"></div>
+          <div class="map-rides-overlay">
+            <div class="mini-ride-pill">
+              <div class="pill-route">MUJ → Civil Lines</div>
+              <div class="pill-meta">8:30 AM · 2 seats</div>
+              <div class="pill-price">₹50</div>
+            </div>
+            <div class="mini-ride-pill">
+              <div class="pill-route">Vaishali → Ajmer Rd</div>
+              <div class="pill-meta">9:00 AM · 3 seats</div>
+              <div class="pill-price">₹40</div>
+            </div>
+            <div class="mini-ride-pill">
+              <div class="pill-route">MI Rd → MUJ</div>
+              <div class="pill-meta">8:45 AM · 1 seat</div>
+              <div class="pill-price">₹60</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-intro reveal">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-heading">Three steps to your next ride</h2>
+      <p class="section-subheading">From sign-up to seat booked in under 2 minutes. No phone calls, no waiting rooms.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <span class="step-badge">Step 1</span>
+        <div class="step-icon">🎓</div>
+        <h3>Create Your Account</h3>
+        <p>Sign up with your college email. Get verified instantly as a Jaipur student or driver. Your identity is always protected.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:0.1s">
+        <span class="step-badge" style="background:linear-gradient(135deg,#818CF8,#4F6EF7)">Step 2</span>
+        <div class="step-icon">🗺️</div>
+        <h3>Find or Post a Ride</h3>
+        <p>Search available rides across Jaipur — from MUJ, Vaishali Nagar, Civil Lines to anywhere in the city. Or post your own seat.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:0.2s">
+        <span class="step-badge" style="background:linear-gradient(135deg,#34D399,#10B981)">Step 3</span>
+        <div class="step-icon">🚗</div>
+        <h3>Ride &amp; Save</h3>
+        <p>Book instantly, track your driver live on the map, and arrive at your destination — while saving up to ₹200 per week.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-intro reveal">
+      <div class="section-label">Why Uniride</div>
+      <h2 class="section-heading">Built for Jaipur's campus life</h2>
+      <p class="section-subheading" style="margin:0 auto">Safe, affordable carpooling designed around how college students actually travel.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon-wrap fi-orange">💰</div>
+        <h3>Save Big Every Week</h3>
+        <p>Split fuel costs with peers on your route. Students save an average of ₹120 per ride compared to solo autos or cabs.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <div class="feature-icon-wrap fi-blue">🔒</div>
+        <h3>Verified Students Only</h3>
+        <p>Every rider provides a college ID or email. No strangers — only verified Jaipur students with real accountability.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.15s">
+        <div class="feature-icon-wrap fi-green">📍</div>
+        <h3>Live Jaipur Tracking</h3>
+        <p>Watch your driver move on the map in real-time. Know exactly when your ride arrives — no guessing, no waiting anxiously.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.2s">
+        <div class="feature-icon-wrap fi-purple">🌱</div>
+        <h3>Greener Jaipur</h3>
+        <p>Fewer cars means less pollution. Every shared ride takes one more vehicle off Jaipur's roads, reducing your carbon footprint.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MAP SECTION ─── -->
+<section class="map-section" id="map-section">
+  <div class="container">
+    <div class="map-section-inner">
+      <!-- Text -->
+      <div class="map-section-text reveal">
+        <div class="section-label">Coverage Area</div>
+        <h2 class="section-heading">Serving all of Jaipur, Rajasthan</h2>
+        <p style="color:var(--tx2);font-size:0.95rem;line-height:1.8;margin-top:0.75rem;">
+          From Manipal University Jaipur in Dehmi Kalan to the Old City and beyond — Uniride covers every major route students travel daily.
+        </p>
+
+        <div class="map-highlights">
+          <div class="map-highlight-item">
+            <div class="mhi-icon fi-orange">🏫</div>
+            <div class="mhi-content">
+              <h4>MUJ, JECRC, Poornima &amp; More</h4>
+              <p>Pickup &amp; drop at all major Jaipur colleges. Campus-to-campus rides available.</p>
+            </div>
+          </div>
+          <div class="map-highlight-item">
+            <div class="mhi-icon fi-blue">🏙️</div>
+            <div class="mhi-content">
+              <h4>City-wide Routes</h4>
+              <p>Civil Lines, Vaishali Nagar, Malviya Nagar, MI Road, Railway Station &amp; more.</p>
+            </div>
+          </div>
+          <div class="map-highlight-item">
+            <div class="mhi-icon fi-green">📍</div>
+            <div class="mhi-content">
+              <h4>Restricted to Jaipur</h4>
+              <p>All rides and bookings are geo-fenced to Jaipur for safety and reliability.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="main-map-wrapper reveal" style="transition-delay:0.2s">
+        <div class="map-header-bar">
+          <div class="map-header-title">
+            📍 Jaipur Ride Coverage Map
+          </div>
+          <div class="map-live-badge" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#059669;font-size:0.7rem;padding:0.22rem 0.65rem;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:liveBlink 1.4s infinite;display:inline-block;"></span>
+            Live
+          </div>
+        </div>
+        <div id="jaipur-preview-map"></div>
+        <div class="map-footer-bar">
+          <div class="map-stat-chip">🚗 Jaipur, Rajasthan</div>
+          <div class="map-stat-chip">📍 India · Restricted Zone</div>
+          <div class="map-stat-chip" style="color:var(--green-dark);border-color:rgba(16,185,129,0.3)">✓ Geo-fenced</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section class="testimonials">
+  <div class="container">
+    <div class="testimonials-intro reveal">
+      <div class="section-label">Student Reviews</div>
+      <h2 class="section-heading">Loved by Jaipur students</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">
+          I save almost ₹2000 a month compared to booking autos! The live tracking is so reassuring — I always know when my ride is coming.
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar fi-orange">👩</div>
+          <div>
+            <div class="author-name">Priya Sharma</div>
+            <div class="author-meta">B.Tech CSE · MUJ, 3rd Year</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal" style="transition-delay:0.1s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">
+          As a driver, I easily recoup my petrol costs by filling my car with 2–3 classmates. It's turned my daily commute into something that actually pays.
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar fi-blue">👨</div>
+          <div>
+            <div class="author-name">Arjun Meena</div>
+            <div class="author-meta">B.Tech ECE · JECRC, 4th Year</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal" style="transition-delay:0.2s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">
+          Super easy to book — seriously under 30 seconds. And since everyone is verified, my parents feel safe knowing I'm only riding with other students.
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar fi-green">👩</div>
+          <div>
+            <div class="author-name">Anjali Gupta</div>
+            <div class="author-meta">BBA · Poornima University, 2nd Year</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA SECTION ─── -->
+<section class="cta-section">
+  <div class="cta-blob cta-blob-1"></div>
+  <div class="container">
+    <div class="reveal">
+      <h2 class="section-heading">Ready to ride smarter in Jaipur?</h2>
+      <p class="section-subheading">Join 500+ students already saving money and time on every commute. It's free, it's fast, and it's built for you.</p>
+      <div class="cta-buttons">
+        <button class="btn-hero-primary" id="ctaSignupBtn" style="padding:1rem 2.25rem;font-size:1.05rem;">
+          Get Started Free — It's Free →
+        </button>
+        <button class="btn-hero-secondary" id="ctaLoginBtn" style="padding:1rem 1.75rem;font-size:1rem;">
+          Already have an account? Login
+        </button>
+      </div>
+      <div class="cta-trust">
+        🔒 Verified student community · 📍 Jaipur, Rajasthan · 🇮🇳 Made in India
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">🚗 Uni<span>ride</span></div>
+        <p class="footer-desc">Smart carpooling for college students in Jaipur, Rajasthan. Connect, share, and save — together.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <div class="footer-links">
+          <a href="#" id="footerLoginBtn">Login</a>
+          <a href="#" id="footerSignupBtn">Sign Up</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Features</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Coverage</div>
+        <div class="footer-links">
+          <a href="#">Manipal University Jaipur</a>
+          <a href="#">JECRC University</a>
+          <a href="#">Poornima University</a>
+          <a href="#">Civil Lines</a>
+          <a href="#">Vaishali Nagar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-bottom-left">© 2025 Uniride. All rights reserved.</div>
+      <div class="footer-bottom-right">
+        <div class="footer-india-badge">🇮🇳 Made in Jaipur</div>
+        <span>for college students</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── LOGIN MODAL ─── -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeLogin">&#x2715;</span>
+    <div class="modal-logo">🚗 Uni<span>ride</span></div>
+    <h2 style="font-size:1.4rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;">Welcome back 👋</h2>
+    <p style="font-size:0.875rem;color:var(--tx2);margin-bottom:1.5rem;">Sign in to your Uniride account</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="your@college.edu" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-primary btn-block" style="margin-top:1rem;padding:0.85rem;font-size:0.95rem;">Login to Uniride</button>
+      <p class="form-footer">Don't have an account? <a href="#" id="switchToSignup">Sign up free</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ─── SIGNUP MODAL ─── -->
+<div id="signupModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeSignup">&#x2715;</span>
+    <div class="modal-logo">🚗 Uni<span>ride</span></div>
+    <h2 style="font-size:1.4rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;">Create Account ✨</h2>
+    <p style="font-size:0.875rem;color:var(--tx2);margin-bottom:1.5rem;">Join Jaipur's student ride community</p>
+    <form id="signupForm">
+      <div class="form-group">
+        <label>I am a:</label>
+        <div class="role-selection">
+          <label class="role-option">
+            <input type="radio" name="role" value="student" checked>
+            <div class="role-card">
+              <span class="role-icon">🎓</span>
+              <strong>Student</strong>
+              <small>Post &amp; search rides</small>
+            </div>
+          </label>
+          <label class="role-option">
+            <input type="radio" name="role" value="driver">
+            <div class="role-card">
+              <span class="role-icon">🚗</span>
+              <strong>Driver</strong>
+              <small>Post rides only</small>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Your full name" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label id="signupEmailLabel">College Email</label>
+        <input type="email" id="signupEmail" placeholder="your@college.edu" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="signupPhone" placeholder="+91 XXXXX XXXXX" required autocomplete="tel">
+      </div>
+      <div class="form-group" id="collegeIdGroup">
+        <label>College ID</label>
+        <input type="text" id="signupCollegeId" placeholder="e.g., CS2023001" required>
+      </div>
+      <div class="form-row" id="branchYearGroup">
+        <div class="form-group">
+          <label>Branch</label>
+          <input type="text" id="signupBranch" placeholder="e.g., CSE" required>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="signupYear" required>
+            <option value="">Select year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" id="vehicleInfoGroup" style="display:none;">
+        <label>Vehicle Information</label>
+        <input type="text" id="signupVehicle" placeholder="e.g., White Honda City, RJ14 AB1234">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPassword" placeholder="Min. 6 characters" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="signupConfirmPassword" placeholder="Repeat password" required>
+      </div>
+      <button type="submit" class="btn-primary btn-block" style="margin-top:1rem;padding:0.85rem;font-size:0.95rem;">Create Account →</button>
+      <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ─── FIREBASE ─── -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+
+<!-- ─── LEAFLET JS ─── -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  /* ─── SCROLL-AWARE NAVBAR ─── */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive: true });
+
+  /* ─── SCROLL REVEAL ─── */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // Fallback: ensure items are visible after 2.5s regardless
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }, 2500);
+
+  /* ─── EXTRA BUTTON HOOKS (CTA + footer) ─── */
+  // Note: loginModal/signupModal already declared in main.js
+  function openLogin()  { document.getElementById('loginModal').classList.add('active'); }
+  function openSignup() { document.getElementById('signupModal').classList.add('active'); }
+
+  document.getElementById('ctaLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); openLogin(); });
+  document.getElementById('ctaSignupBtn')?.addEventListener('click', (e) => { e.preventDefault(); openSignup(); });
+  document.getElementById('footerLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); openLogin(); });
+  document.getElementById('footerSignupBtn')?.addEventListener('click', (e) => { e.preventDefault(); openSignup(); });
+
+  /* ─── PARTICLE CANVAS ─── */
+  (function() {
+    const canvas = document.getElementById('particles-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * W;
+        this.y = Math.random() * H;
+        this.r = Math.random() * 1.5 + 0.5;
+        this.dx = (Math.random() - 0.5) * 0.3;
+        this.dy = (Math.random() - 0.5) * 0.3 - 0.1;
+        this.alpha = Math.random() * 0.4 + 0.05;
+      }
+      update() {
+        this.x += this.dx; this.y += this.dy;
+        if (this.y < 0 || this.x < 0 || this.x > W) this.reset();
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function init() {
+      resize();
+      particles = Array.from({ length: 80 }, () => new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    init();
+    animate();
+  })();
+
+  /* ─── MAPS (Hero & Jaipur Section) ─── */
+  (function() {
+    const JAIPUR_CENTER = [26.8467, 75.7517];
+    const JAIPUR_BOUNDS = [[26.3, 74.8], [27.5, 76.6]];
+    const MUJ_COORDS = [26.8439, 75.5652];
+
+    function initMaps() {
+      if (typeof L === 'undefined') {
+        setTimeout(initMaps, 100);
+        return;
+      }
+
+      // 1. Hero Map
+      const heroMapEl = document.getElementById('hero-map');
+      if (heroMapEl && !heroMapEl._leaflet_id) {
+        const heroMap = L.map('hero-map', {
+          center: MUJ_COORDS,
+          zoom: 12,
+          zoomControl: true,
+          attributionControl: false,
+          scrollWheelZoom: true,
+          dragging: true,
+          maxBounds: JAIPUR_BOUNDS,
+          maxBoundsViscosity: 0.8,
+          minZoom: 9
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(heroMap);
+
+        // Sample ride markers around Jaipur
+        const rides = [
+          { pos: [26.8439, 75.5652], label: '🎓 MUJ Campus Hub', info: 'Manipal University Jaipur · Main Campus', color: '#FF5C00' },
+          { pos: [26.9124, 75.7873], label: '🏙️ Civil Lines', info: 'Metro Station · Daily commuter route', color: '#4F6EF7' },
+          { pos: [26.8858, 75.8245], label: '🛒 Vaishali Nagar', info: 'Student residential & food zone', color: '#10B981' },
+          { pos: [26.8828, 75.8069], label: '🏫 JECRC', info: 'JECRC University · Inter-campus link', color: '#F59E0B' },
+        ];
+
+        rides.forEach(r => {
+          const icon = L.divIcon({
+            html: `<div style="background:${r.color};width:16px;height:16px;border-radius:50%;border:2.5px solid white;box-shadow:0 0 10px ${r.color}90;cursor:pointer;"></div>`,
+            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+          });
+          const marker = L.marker(r.pos, { icon }).addTo(heroMap);
+          marker.bindPopup(`<strong>${r.label}</strong><br><span style="font-size:0.8rem;color:#64748b">${r.info}</span>`);
+        });
+
+        // Draw animated route line
+        const routeLine = L.polyline([MUJ_COORDS, [26.8858, 75.8245], [26.9124, 75.7873]], {
+          color: '#FF5C00', weight: 3.5, opacity: 0.8, dashArray: '8,6'
+        }).addTo(heroMap);
+        routeLine.bindPopup('<strong>Route: MUJ → Vaishali → Civil Lines</strong><br><small>Avg fare: ₹50/seat · 40 mins</small>');
+
+        // Interactive mini ride pills
+        const pills = document.querySelectorAll('.mini-ride-pill');
+        const pillTargets = [
+          { center: [26.878, 75.676], zoom: 12 },
+          { center: [26.8858, 75.8245], zoom: 13 },
+          { center: [26.9124, 75.7873], zoom: 13 }
+        ];
+        pills.forEach((pill, idx) => {
+          pill.style.cursor = 'pointer';
+          pill.addEventListener('click', () => {
+            if (pillTargets[idx]) {
+              heroMap.flyTo(pillTargets[idx].center, pillTargets[idx].zoom, { duration: 1 });
+            }
+          });
+        });
+
+        // Multiple size invalidations to ensure tiles render immediately
+        [100, 300, 700, 1500].forEach(delay => {
+          setTimeout(() => { if (heroMap) heroMap.invalidateSize(); }, delay);
+        });
+        window.addEventListener('resize', () => { if (heroMap) heroMap.invalidateSize(); });
+      }
+
+      // 2. Jaipur Section Map
+      const jpMapEl = document.getElementById('jaipur-preview-map');
+      if (jpMapEl && !jpMapEl._leaflet_id) {
+        const jpMap = L.map('jaipur-preview-map', {
+          center: JAIPUR_CENTER,
+          zoom: 11,
+          zoomControl: true,
+          attributionControl: false,
+          maxBounds: JAIPUR_BOUNDS,
+          maxBoundsViscosity: 0.8,
+          minZoom: 9
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(jpMap);
+
+        // Coverage zone polygon
+        L.rectangle(JAIPUR_BOUNDS, {
+          color: '#FF5C00', weight: 2, fillColor: '#FF5C00',
+          fillOpacity: 0.05, dashArray: '8,5'
+        }).addTo(jpMap);
+
+        // Key college markers
+        const colleges = [
+          { pos: MUJ_COORDS, label: 'Manipal University Jaipur', icon: '🎓', color: '#FF5C00' },
+          { pos: [26.8828, 75.8069], label: 'JECRC University', icon: '🏫', color: '#4F6EF7' },
+          { pos: [26.8749, 75.7685], label: 'Poornima University', icon: '📚', color: '#10B981' },
+          { pos: [26.9124, 75.7873], label: 'Civil Lines', icon: '🏙️', color: '#F59E0B' },
+          { pos: [26.9261, 75.8069], label: 'Jaipur Railway Station', icon: '🚂', color: '#6366F1' },
+          { pos: [26.8242, 75.8122], label: 'Jaipur Airport', icon: '✈️', color: '#8B5CF6' },
+          { pos: [26.8858, 75.8245], label: 'Vaishali Nagar', icon: '🛒', color: '#EF4444' },
+          { pos: [26.8525, 75.8052], label: 'Malviya Nagar', icon: '🏘️', color: '#0EA5E9' },
+        ];
+
+        colleges.forEach(c => {
+          const icon = L.divIcon({
+            html: `<div style="background:${c.color};width:34px;height:34px;border-radius:50%;border:3px solid white;box-shadow:0 3px 12px ${c.color}60;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;">${c.icon}</div>`,
+            className: '', iconSize: [34, 34], iconAnchor: [17, 17]
+          });
+          L.marker(c.pos, { icon }).addTo(jpMap)
+            .bindPopup(`<strong>${c.label}</strong><br><span style="font-size:0.78rem;color:#475569">Jaipur, Rajasthan, India</span><br><small style="color:#FF5C00;font-weight:600;">Active Uniride Zone</small>`, { maxWidth: 220 });
+        });
+
+        // Sample ride routes
+        L.polyline([MUJ_COORDS, [26.8858, 75.8245], [26.9124, 75.7873]], {
+          color: '#FF5C00', weight: 3.5, opacity: 0.8, dashArray: '8,5'
+        }).addTo(jpMap).bindTooltip('Route: MUJ → Vaishali → Civil Lines');
+
+        L.polyline([[26.8828, 75.8069], [26.8525, 75.8052], [26.9261, 75.8069]], {
+          color: '#4F6EF7', weight: 3.5, opacity: 0.8, dashArray: '8,5'
+        }).addTo(jpMap).bindTooltip('Route: JECRC → Malviya → Station');
+
+        // Observe when map section becomes visible in scroll reveal
+        const mapWrapper = document.querySelector('.main-map-wrapper');
+        if (mapWrapper) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                setTimeout(() => jpMap.invalidateSize(), 150);
+                setTimeout(() => jpMap.invalidateSize(), 400);
+              }
+            });
+          }, { threshold: 0.1 });
+          observer.observe(mapWrapper);
+        }
+
+        [100, 300, 700, 1500].forEach(delay => {
+          setTimeout(() => { if (jpMap) jpMap.invalidateSize(); }, delay);
+        });
+
+        window.addEventListener('resize', () => { if (jpMap) jpMap.invalidateSize(); });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMaps);
+    } else {
+      initMaps();
+    }
+  })();
+
+  /* ─── SMOOTH SCROLL FOR LEARN MORE ─── */
+  document.getElementById('learnMoreBtn')?.addEventListener('click', () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>
+
+</body>
+</html>

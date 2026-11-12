@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Uniride Admin — Manage users, rides, bookings and analytics.">
+    <title>Admin — Uniride</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-fluid" id="adminNav">
+        <div class="container">
+            <div class="nav-brand">🚗 Uni<span>ride</span></div>
+            <div class="nav-menu">
+                <span id="userGreeting" class="admin-badge">Admin</span>
+                <button id="logoutBtn" class="btn-secondary btn-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar (dark) -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-text">🚗 Uni<span>ride</span></div>
+            </div>
+            <div class="sidebar-label">Main Menu</div>
+            <div class="sidebar-menu">
+                <a href="#" class="sidebar-item active" data-section="home">
+                    <span class="icon">📊</span> Overview
+                </a>
+                <a href="#" class="sidebar-item" data-section="users">
+                    <span class="icon">👥</span> Users
+                </a>
+                <a href="#" class="sidebar-item" data-section="rides">
+                    <span class="icon">🚗</span> All Rides
+                </a>
+                <a href="#" class="sidebar-item" data-section="bookings">
+                    <span class="icon">📋</span> Bookings
+                </a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-label" style="padding-top:0;">Reports</div>
+                <a href="#" class="sidebar-item" data-section="analytics">
+                    <span class="icon">📈</span> Analytics
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Overview Section -->
+            <section id="homeSection" class="content-section active">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">System Overview</div>
+                        <div class="page-subtitle">Real-time platform statistics</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <h4>Total Users</h4>
+                        <p class="stat-number" id="totalUsers">0</p>
+                        <small>👥 Registered accounts</small>
+                    </div>
+                    <div class="stat-card stat-success">
+                        <h4>Active Rides</h4>
+                        <p class="stat-number" id="totalRides">0</p>
+                        <small>🚗 Currently posted</small>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <h4>Total Bookings</h4>
+                        <p class="stat-number" id="totalBookings">0</p>
+                        <small>📋 All time</small>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <h4>Pending</h4>
+                        <p class="stat-number" id="pendingRequests">0</p>
+                        <small>⏳ Awaiting approval</small>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <div class="admin-actions">
+                        <button class="btn-primary" onclick="viewAllUsers()">👥 All Users</button>
+                        <button class="btn-primary" onclick="viewAllRides()">🚗 All Rides</button>
+                        <button class="btn-secondary" onclick="exportData()">📥 Export Data</button>
+                        <button class="btn-secondary" onclick="refreshStats()">🔄 Refresh</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Activity</h3>
+                    <div id="recentActivity"></div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="usersSection" class="content-section">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Manage Users</div>
+                        <div class="page-subtitle">View and manage all registered accounts</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="admin-filters">
+                        <input type="text" id="searchUsers" placeholder="Search by name or email...">
+                        <select id="filterRole">
+                            <option value="all">All Roles</option>
+                            <option value="student">Students</option>
+                            <option value="driver">Drivers</option>
+                            <option value="admin">Admins</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="usersList"></div>
+            </section>
+
+            <!-- Rides Section -->
+            <section id="ridesSection" class="content-section">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">All Rides</div>
+                        <div class="page-subtitle">Browse and manage every posted ride</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="admin-filters">
+                        <input type="text" id="searchRides" placeholder="Search by route...">
+                        <select id="filterStatus">
+                            <option value="all">All Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="ridesList"></div>
+            </section>
+
+            <!-- Bookings Section -->
+            <section id="bookingsSection" class="content-section">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">All Bookings</div>
+                        <div class="page-subtitle">Monitor and manage ride bookings</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="admin-filters">
+                        <div style="font-size:0.875rem;color:var(--tx2);align-self:center;">Filter by status</div>
+                        <select id="filterBookingStatus">
+                            <option value="all">All Status</option>
+                            <option value="REQUESTED">Requested</option>
+                            <option value="ACCEPTED">Accepted</option>
+                            <option value="REJECTED">Rejected</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="bookingsList"></div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analyticsSection" class="content-section">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Analytics &amp; Reports</div>
+                        <div class="page-subtitle">Platform performance and trends</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <h4>Students</h4>
+                        <p class="stat-number" id="studentCount">0</p>
+                        <small>🎓 Enrolled</small>
+                    </div>
+                    <div class="stat-card stat-success">
+                        <h4>Drivers</h4>
+                        <p class="stat-number" id="driverCount">0</p>
+                        <small>🚗 Registered</small>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <h4>Avg. Fare</h4>
+                        <p class="stat-number" id="avgFare">₹0</p>
+                        <small>💰 Per ride</small>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <h4>Success Rate</h4>
+                        <p class="stat-number" id="successRate">0%</p>
+                        <small>✅ Completed</small>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Popular Routes</h3>
+                    <div id="popularRoutes"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Top Users</h3>
+                    <div id="topUsers"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/admin.js"></script>
+
+    <script>
+        const nav = document.getElementById('adminNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 30);
+        }, { passive: true });
+    </script>
+</body>
+
+</html>

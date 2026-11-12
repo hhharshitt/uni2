@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+      }
+    },
+    "trips": {
+      ".read": true,
+      ".indexOn": ["departAt", "driverId", "status"],
+      "$tripId": {
+        ".write": "auth != null"
+      }
+    },
+    "bookings": {
+      ".read": "auth != null",
+      ".indexOn": ["tripId", "riderId", "driverId"],
+      "$bookingId": {
+        ".write": "auth != null"
+      }
+    },
+    "tripMembers": {
+      ".read": "auth != null",
+      "$tripId": {
+        ".write": "auth != null"
+      }
+    },
+    "chats": {
+      "$tripId": {
+        ".read": "auth != null",
+        ".indexOn": ["at"],
+        ".write": "auth != null"
+      }
+    },
+    "sos": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}

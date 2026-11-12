@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    background: #1c1c1c;
+    color: #0a0a0a;
+    overscroll-behavior: none;
+    font-family: var(--font-display), system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------- hazard stripes */
+
+.stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #fbbf24 0px,
+    #fbbf24 10px,
+    #0a0a0a 10px,
+    #0a0a0a 20px
+  );
+  /* horizontal period of a 20px stripe at 45deg = 20 * sqrt(2) */
+  background-size: 28.284px 28.284px;
+  animation: stripes-move 0.9s linear infinite;
+}
+
+@keyframes stripes-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 28.284px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stripes {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- leaflet */
+
+.leaflet-container {
+  font-family: var(--font-display), system-ui, sans-serif;
+  background: #d4d4d0;
+}
+
+/* industrial monochrome basemap so route + markers pop */
+.map-tiles {
+  filter: grayscale(1) contrast(1.08) brightness(1.03);
+}
+
+.uni-icon {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.cab-rot {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 50% 50%;
+  transition: transform 300ms linear;
+  filter: drop-shadow(3px 3px 0px #000);
+}
+
+/* keep controls clear of the 56px top bar */
+.leaflet-top {
+  top: 64px;
+}
+
+.leaflet-control-zoom.leaflet-bar {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0px 0px #000 !important;
+}
+
+.leaflet-control-zoom a {
+  background: #fff !important;
+  color: #000 !important;
+  font-family: var(--font-mono), ui-monospace, monospace !important;
+  font-weight: 800 !important;
+  border-radius: 0 !important;
+  border-bottom: 2px solid #000 !important;
+}
+
+.leaflet-control-zoom a:last-child {
+  border-bottom: 0 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #fbbf24 !important;
+}
+
+.leaflet-control-attribution {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+}
+
+.leaflet-control-attribution a {
+  color: #000 !important;
+  text-decoration: underline;
+}
+
+/* mobile: pinch-zoom replaces buttons; attribution moves above the bottom sheet */
+@media (max-width: 767px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+
+  .leaflet-bottom.leaflet-right {
+    top: 56px;
+    bottom: auto;
+    left: 0;
+    right: auto;
+  }
+
+  .leaflet-bottom.leaflet-right .leaflet-control-attribution {
+    border-top: 0;
+    border-left: 0;
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
+  }
+}
