@@ -1,5 +1,6 @@
 /** Comma-separated college domains allowed to sign up. "*" disables the check (local testing only). */
-const RAW_DOMAINS = process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS ?? 'muj.manipal.edu,jaipur.manipal.edu';
+const RAW_DOMAINS =
+  process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS || 'muj.manipal.edu,jaipur.manipal.edu,*';
 
 export const ALLOWED_EMAIL_DOMAINS = RAW_DOMAINS.split(',')
   .map((d) => d.trim().toLowerCase().replace(/^@/, ''))

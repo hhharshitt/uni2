@@ -4,13 +4,14 @@ import { getDatabase, type Database } from 'firebase/database';
 
 // NEXT_PUBLIC_* values must be referenced literally so Next.js inlines them into the client bundle.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyBqMxGKXVTIqgUZIaA5Qdqo65H94pSJOsY',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'unirideweb.firebaseapp.com',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unirideweb',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'unirideweb.firebasestorage.app',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '436899299933',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:436899299933:web:985605bb705c947c7f03b4',
+  databaseURL:
+    process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || 'https://unirideweb-default-rtdb.firebaseio.com',
 };
 
 export const isFirebaseConfigured = Boolean(
