@@ -5,21 +5,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        signal: '#FBBF24',
-        ink: '#0A0A0A',
-        charcoal: '#1C1C1C',
-        paper: '#F5F5F0',
-        go: '#22C55E',
-        halt: '#EF4444',
+        signal: '#6366F1',
+        ink: '#0F172A',
+        charcoal: '#090D16',
+        paper: '#F8FAFC',
+        go: '#10B981',
+        halt: '#F43F5E',
       },
       fontFamily: {
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        brutal: '4px 4px 0px 0px #000',
-        'brutal-sm': '2px 2px 0px 0px #000',
-        'brutal-lg': '8px 8px 0px 0px #000',
+        glow: '0 0 25px -5px rgba(99, 102, 241, 0.4)',
+        'glass-lg': '0 20px 50px -12px rgba(0, 0, 0, 0.65)',
       },
     },
   },
@@ -27,4 +26,3 @@ const config: Config = {
 };
 
 export default config;
-

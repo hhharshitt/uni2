@@ -67,18 +67,19 @@ export interface CarpoolHUDProps {
 }
 
 const BTN_BASE =
-  'inline-flex items-center justify-center gap-2 border-2 border-black px-3 py-2.5 text-xs font-bold uppercase tracking-wider ' +
-  'shadow-[4px_4px_0px_0px_#000] transition-[transform,box-shadow] duration-75 ' +
-  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000] ' +
-  'disabled:cursor-not-allowed disabled:opacity-50';
-const BTN_PRIMARY = `${BTN_BASE} w-full bg-[#FBBF24] text-black hover:bg-[#F59E0B]`;
-const BTN_DARK = `${BTN_BASE} w-full bg-[#0A0A0A] text-[#FBBF24] hover:bg-[#1C1C1C]`;
-const BTN_GHOST = `${BTN_BASE} w-full bg-white text-black hover:bg-[#F5F5F0]`;
-const BTN_DANGER = `${BTN_BASE} w-full bg-[#EF4444] text-white hover:bg-[#DC2626]`;
-const LABEL = 'font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black/60';
+  'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition duration-150 ' +
+  'active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
+const BTN_PRIMARY = `${BTN_BASE} w-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 hover:brightness-110`;
+const BTN_GHOST = `${BTN_BASE} w-full border border-white/10 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white`;
+const BTN_DANGER = `${BTN_BASE} w-full border border-rose-500/30 bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-lg shadow-rose-500/20 hover:brightness-110`;
+const LABEL = 'text-[11px] font-semibold uppercase tracking-wider text-slate-400';
 
-function Block({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`border-2 border-black bg-white ${className}`}>{children}</div>;
+function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-2xl border border-white/10 bg-slate-800/50 backdrop-blur-md ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 function fmtDateTime(ms: number): string {
@@ -102,59 +103,72 @@ export default function BookingHUD(props: CarpoolHUDProps) {
   const savedEntries = Object.entries(props.user.savedPlaces ?? {});
 
   return (
-    <section className="pointer-events-auto flex max-h-full min-h-0 flex-col border-2 border-black bg-[#F5F5F0] shadow-[6px_6px_0px_0px_#000]">
-      <div className="flex items-center justify-between border-b-2 border-black bg-[#0A0A0A] px-3 py-2 text-white">
+    <section className="pointer-events-auto flex max-h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/90 text-slate-100 shadow-glass-lg backdrop-blur-2xl">
+      {/* Console Top Header & Tabs */}
+      <div className="flex items-center justify-between border-b border-white/10 bg-slate-950/50 px-4 py-3">
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}
-          className="flex items-center gap-2 text-left font-mono text-xs font-bold uppercase tracking-[0.2em]"
+          className="flex items-center gap-2 text-left text-xs font-bold text-white"
         >
-          <span>{props.mode === 'rider' ? '🎓 Student Rider' : '🚗 Driver Host'}</span>
-          {props.user.verified && (
-            <span className="border border-black bg-[#22C55E] px-1.5 py-0.5 text-[9px] text-black">✓ VERIFIED</span>
-          )}
-          <span className="md:hidden">{collapsed ? '▲' : '▼'}</span>
+          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-sm">
+            {props.mode === 'rider' ? '🎓' : '🚗'}
+          </span>
+          <span>{props.mode === 'rider' ? 'Rider Console' : 'Driver Host'}</span>
+          <span className="text-slate-400 md:hidden">{collapsed ? '▲' : '▼'}</span>
         </button>
 
-        <div className="flex gap-1">
+        <div className="flex rounded-xl border border-white/10 bg-slate-900/90 p-0.5">
           <button
             type="button"
             onClick={() => setTab('plan')}
-            className={`border border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase ${
-              tab === 'plan' ? 'bg-[#FBBF24] text-black' : 'bg-white/10 text-white'
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+              tab === 'plan'
+                ? 'bg-indigo-500 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {props.mode === 'rider' ? 'Find' : 'Post'}
+            {props.mode === 'rider' ? 'Explore' : 'Post Ride'}
           </button>
           <button
             type="button"
             onClick={() => setTab('trips')}
-            className={`border border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase ${
-              tab === 'trips' ? 'bg-[#FBBF24] text-black' : 'bg-white/10 text-white'
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+              tab === 'trips'
+                ? 'bg-indigo-500 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            My ({props.mode === 'rider' ? props.myBookings.length : props.driverTrips.length})
+            My Rides ({props.mode === 'rider' ? props.myBookings.length : props.driverTrips.length})
           </button>
           {props.activeTrip && (
             <button
               type="button"
               onClick={() => setTab('active')}
-              className={`border border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase ${
-                tab === 'active' ? 'bg-[#22C55E] text-black' : 'bg-white/10 text-white'
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+                tab === 'active'
+                  ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                  : 'text-emerald-400 hover:bg-emerald-500/10'
               }`}
             >
-              Live
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
+              <span>Live</span>
             </button>
           )}
         </div>
       </div>
 
-      <div className={`${collapsed ? 'hidden md:block' : 'block'} min-h-0 space-y-3 overflow-y-auto overscroll-contain p-3.5`}>
+      {/* Console Body */}
+      <div className={`${collapsed ? 'hidden md:block' : 'block'} min-h-0 space-y-3.5 overflow-y-auto overscroll-contain p-4`}>
         {props.error && (
-          <div className="flex items-start justify-between gap-2 border-2 border-black bg-[#EF4444] px-3 py-2 text-xs font-bold text-white">
-            <span>⚠ {props.error}</span>
-            <button type="button" onClick={props.onClearError} className="font-mono">
-              ×
+          <div className="flex items-start justify-between gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/15 px-3.5 py-2.5 text-xs font-medium text-rose-200">
+            <span>⚠️ {props.error}</span>
+            <button
+              type="button"
+              onClick={props.onClearError}
+              className="rounded-lg px-1.5 text-rose-300 hover:bg-rose-500/20"
+            >
+              ✕
             </button>
           </div>
         )}
@@ -200,9 +214,9 @@ function PlannerView(
   const activePlace = props.selecting === 'from' ? props.from : props.to;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3.5">
       {/* Route Endpoints */}
-      <div className="relative space-y-1.5">
+      <div className="relative space-y-2">
         <LocationRow
           target="from"
           place={props.from}
@@ -221,7 +235,8 @@ function PlannerView(
           <button
             type="button"
             onClick={props.onSwap}
-            className="absolute right-10 top-1/2 -translate-y-1/2 border-2 border-black bg-white px-2 py-0.5 font-mono text-xs font-bold shadow-[2px_2px_0px_0px_#000] hover:bg-[#FBBF24]"
+            title="Swap origin & destination"
+            className="absolute right-10 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-slate-800 text-xs font-bold text-slate-200 shadow-lg transition hover:border-indigo-400 hover:bg-indigo-600 hover:text-white"
           >
             ⇅
           </button>
@@ -231,19 +246,19 @@ function PlannerView(
       <PlaceSearch target={props.selecting} onPick={(p) => props.onPlacePicked(props.selecting, p)} />
 
       {/* Saved Places + Quick Jaipur chips */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className={LABEL}>Quick Jaipur & Saved Places</span>
+          <span className={LABEL}>Quick Jaipur Hotspots</span>
           {activePlace && (
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {(['Home', 'Campus'] as const).map((slot) => (
                 <button
                   key={slot}
                   type="button"
                   onClick={() => props.onSavePlace(slot, activePlace)}
-                  className="border border-black bg-[#FBBF24] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase"
+                  className="rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 transition hover:bg-indigo-500/25"
                 >
-                  Save as {slot}
+                  + Save {slot}
                 </button>
               ))}
             </div>
@@ -252,18 +267,21 @@ function PlannerView(
 
         <div className="flex flex-wrap gap-1.5">
           {props.savedEntries.map(([name, place]) => (
-            <span key={name} className="inline-flex items-center border-2 border-black bg-[#FBBF24] text-[11px] font-bold">
+            <span
+              key={name}
+              className="inline-flex items-center overflow-hidden rounded-full border border-amber-400/30 bg-amber-400/15 text-[11px] font-semibold text-amber-300"
+            >
               <button
                 type="button"
                 onClick={() => props.onPlacePicked(props.selecting, place)}
-                className="px-2 py-0.5 uppercase"
+                className="px-2.5 py-1 transition hover:bg-amber-400/20"
               >
                 ★ {name}
               </button>
               <button
                 type="button"
                 onClick={() => props.onRemoveSavedPlace(name)}
-                className="border-l border-black px-1.5 hover:bg-black hover:text-white"
+                className="border-l border-amber-400/20 px-2 py-1 text-amber-300/70 hover:bg-rose-500/30 hover:text-white"
               >
                 ×
               </button>
@@ -274,7 +292,7 @@ function PlannerView(
               key={p.label}
               type="button"
               onClick={() => props.onPlacePicked(props.selecting, p)}
-              className="border-2 border-black bg-white px-2 py-0.5 text-[11px] font-bold uppercase shadow-[2px_2px_0px_0px_#000] hover:bg-[#FBBF24]"
+              className="rounded-full border border-white/10 bg-slate-800/70 px-3 py-1 text-[11px] font-medium text-slate-300 transition hover:border-indigo-500/40 hover:bg-indigo-500/20 hover:text-white"
             >
               {p.label}
             </button>
@@ -284,52 +302,66 @@ function PlannerView(
 
       {/* OSRM Route summary */}
       {props.routeLoading && (
-        <div className="stripes h-12 border-2 border-black flex items-center justify-center">
-          <span className="border-2 border-black bg-white px-2 py-0.5 font-mono text-[10px] font-bold uppercase">
-            Calculating OSRM road route…
+        <div className="shimmer-bar flex h-12 items-center justify-center rounded-2xl border border-indigo-500/20">
+          <span className="text-xs font-semibold text-indigo-200">
+            Calculating fastest Jaipur road route…
           </span>
         </div>
       )}
       {props.routeError && (
-        <div className="flex items-center justify-between border-2 border-black bg-[#EF4444] px-3 py-1.5 text-xs font-bold text-white">
+        <div className="flex items-center justify-between rounded-2xl border border-rose-500/30 bg-rose-500/15 px-3.5 py-2 text-xs font-medium text-rose-200">
           <span>{props.routeError}</span>
-          <button type="button" onClick={props.onRetryRoute} className="underline">
+          <button type="button" onClick={props.onRetryRoute} className="font-semibold underline">
             Retry
           </button>
         </div>
       )}
       {props.route && !props.routeLoading && (
-        <div className="grid grid-cols-3 border-2 border-black bg-white text-center">
-          <div className="border-r-2 border-black p-2">
-            <div className={LABEL}>Distance</div>
-            <div className="font-mono text-sm font-bold">{props.route.distanceKm.toFixed(1)} km</div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-2xl border border-white/10 bg-slate-800/60 p-2.5 text-center">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Distance</div>
+            <div className="mt-0.5 font-mono text-sm font-bold text-white">
+              {props.route.distanceKm.toFixed(1)} km
+            </div>
           </div>
-          <div className="border-r-2 border-black p-2">
-            <div className={LABEL}>Est. Time</div>
-            <div className="font-mono text-sm font-bold">{props.route.durationMin} min</div>
+          <div className="rounded-2xl border border-white/10 bg-slate-800/60 p-2.5 text-center">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Est. Time</div>
+            <div className="mt-0.5 font-mono text-sm font-bold text-white">
+              {props.route.durationMin} min
+            </div>
           </div>
-          <div className="bg-[#FBBF24] p-2">
-            <div className={LABEL}>Solo Cab (₹{RATE_PER_KM}/km)</div>
-            <div className="font-mono text-sm font-bold">{formatINR(props.route.fare)}</div>
+          <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/15 p-2.5 text-center">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-indigo-300">
+              Solo Cab (₹{RATE_PER_KM}/km)
+            </div>
+            <div className="mt-0.5 font-mono text-sm font-bold text-indigo-200">
+              {formatINR(props.route.fare)}
+            </div>
           </div>
         </div>
       )}
 
       {/* Mode-specific controls */}
       {props.mode === 'driver' ? (
-        <Block className="space-y-3 p-3">
-          <div className="font-mono text-xs font-bold uppercase">Post Carpool Offer</div>
-          <div className="grid grid-cols-2 gap-2">
+        <Card className="space-y-3.5 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-white">Publish a Campus Carpool</span>
+            <span className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-300">
+              Host Mode
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             <label className="block">
-              <span className={LABEL}>Departure</span>
+              <span className={LABEL}>Departure Time</span>
               <input
                 type="datetime-local"
                 value={departIso}
                 onChange={(e) => setDepartIso(e.target.value)}
-                className="mt-1 w-full border-2 border-black px-2 py-1.5 font-mono text-xs font-bold"
+                className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 font-mono text-xs text-white outline-none focus:border-indigo-500"
               />
             </label>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <label className="block">
                 <span className={LABEL}>Seats</span>
                 <input
@@ -338,7 +370,7 @@ function PlannerView(
                   max={MAX_SEATS}
                   value={seats}
                   onChange={(e) => setSeats(Math.min(MAX_SEATS, Math.max(1, Number(e.target.value) || 1)))}
-                  className="mt-1 w-full border-2 border-black px-2 py-1.5 font-mono text-xs font-bold"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 font-mono text-xs font-bold text-white outline-none focus:border-indigo-500"
                 />
               </label>
               <label className="block">
@@ -349,55 +381,57 @@ function PlannerView(
                   step={5}
                   value={pricePerSeat}
                   onChange={(e) => setPricePerSeat(Math.max(0, Number(e.target.value) || 0))}
-                  className="mt-1 w-full border-2 border-black px-2 py-1.5 font-mono text-xs font-bold"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 font-mono text-xs font-bold text-emerald-400 outline-none focus:border-indigo-500"
                 />
               </label>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3 text-xs font-bold">
-            <label className="inline-flex items-center gap-1.5 cursor-pointer">
+          <div className="flex flex-wrap gap-3 pt-0.5 text-xs font-medium text-slate-300">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-slate-950/40 px-3 py-1.5 transition hover:border-pink-500/30">
               <input
                 type="checkbox"
                 checked={womenOnly}
                 onChange={(e) => setWomenOnly(e.target.checked)}
-                className="h-4 w-4 accent-black"
+                className="h-3.5 w-3.5 rounded accent-pink-500"
               />
               <span>🚺 Women-only ride</span>
             </label>
-            <label className="inline-flex items-center gap-1.5 cursor-pointer">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-slate-950/40 px-3 py-1.5 transition hover:border-indigo-500/30">
               <input
                 type="checkbox"
                 checked={recurring}
                 onChange={(e) => setRecurring(e.target.checked)}
-                className="h-4 w-4 accent-black"
+                className="h-3.5 w-3.5 rounded accent-indigo-500"
               />
-              <span>🔁 Recurring campus commute</span>
+              <span>🔁 Recurring schedule</span>
             </label>
           </div>
 
           {recurring && (
-            <div className="space-y-2 border-t-2 border-black pt-2">
+            <div className="space-y-2.5 border-t border-white/10 pt-3">
               <div className="flex items-center justify-between">
-                <span className={LABEL}>Repeat days</span>
+                <span className={LABEL}>Repeat on days</span>
                 <select
                   value={weeks}
                   onChange={(e) => setWeeks(Number(e.target.value))}
-                  className="border border-black px-1.5 py-0.5 font-mono text-[10px] font-bold"
+                  className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-xs font-medium text-slate-200 outline-none"
                 >
-                  <option value={1}>1 week</option>
-                  <option value={2}>2 weeks</option>
-                  <option value={4}>4 weeks</option>
+                  <option value={1}>For 1 week</option>
+                  <option value={2}>For 2 weeks</option>
+                  <option value={4}>For 4 weeks</option>
                 </select>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((lbl, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => toggleDay(idx)}
-                    className={`flex-1 border-2 border-black py-1 font-mono text-xs font-bold ${
-                      days.includes(idx) ? 'bg-[#FBBF24]' : 'bg-white'
+                    className={`flex-1 rounded-xl py-1.5 text-xs font-bold transition ${
+                      days.includes(idx)
+                        ? 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/30'
+                        : 'border border-white/10 bg-slate-950/50 text-slate-400 hover:text-white'
                     }`}
                   >
                     {lbl}
@@ -422,31 +456,31 @@ function PlannerView(
             className={BTN_PRIMARY}
           >
             {props.busy
-              ? 'Publishing…'
+              ? 'Publishing Ride…'
               : `Publish Ride · ${seats} seats × ${formatINR(pricePerSeat)}`}
           </button>
-        </Block>
+        </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <span className={LABEL}>Available Carpools ({props.upcomingTrips.length})</span>
             <div className="flex items-center gap-2">
-              <label className="inline-flex items-center gap-1 text-[11px] font-bold cursor-pointer">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 bg-slate-800/60 px-2.5 py-1 text-[11px] font-medium text-slate-300">
                 <input
                   type="checkbox"
                   checked={props.womenOnlyFilter}
                   onChange={(e) => props.onWomenOnlyFilterChange(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-black"
+                  className="h-3.5 w-3.5 rounded accent-pink-500"
                 />
                 <span>🚺 Women-only</span>
               </label>
               <select
                 value={seatReq}
                 onChange={(e) => setSeatReq(Number(e.target.value))}
-                className="border-2 border-black bg-white px-1.5 py-0.5 font-mono text-[11px] font-bold"
+                className="rounded-lg border border-white/10 bg-slate-800/80 px-2 py-1 text-[11px] font-semibold text-white outline-none"
               >
                 {[1, 2, 3, 4].map((n) => (
-                  <option key={n} value={n}>
+                  <option key={n} value={n} className="bg-slate-900">
                     {n} seat{n > 1 ? 's' : ''}
                   </option>
                 ))}
@@ -455,74 +489,94 @@ function PlannerView(
           </div>
 
           {props.upcomingTrips.length === 0 ? (
-            <Block className="p-4 text-center text-xs font-bold text-black/60">
-              No matching carpools right now. Try clearing endpoints or switch to Driver mode to post one.
-            </Block>
+            <Card className="p-5 text-center text-xs text-slate-400">
+              No matching carpools right now. Try clearing endpoints or switch to{' '}
+              <span className="font-semibold text-indigo-300">Driver</span> mode to post a ride.
+            </Card>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {props.upcomingTrips.map((t) => {
                 const mine = props.myBookings.find(
                   (b) => b.tripId === t.id && b.status !== 'cancelled' && b.status !== 'rejected',
                 );
                 return (
-                  <li key={t.id} className="border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_0px_#000]">
+                  <li
+                    key={t.id}
+                    className="rounded-2xl border border-white/10 bg-slate-800/60 p-3.5 transition hover:border-white/20"
+                  >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 text-xs font-bold">
-                        <span>{t.driverName}</span>
-                        {t.driverVerified && (
-                          <span className="border border-black bg-[#22C55E] px-1 text-[9px] font-mono">✓ ID</span>
-                        )}
-                        {t.womenOnly && (
-                          <span className="border border-black bg-pink-300 px-1 text-[9px] font-mono">🚺 WOMEN</span>
-                        )}
-                        {t.seriesId && (
-                          <span className="border border-black bg-[#FBBF24] px-1 text-[9px] font-mono">🔁 DAILY</span>
-                        )}
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-xs font-bold text-indigo-300">
+                          {t.driverName.slice(0, 1).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-white">
+                            <span>{t.driverName}</span>
+                            {t.driverVerified && (
+                              <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-400">
+                                ✓ ID
+                              </span>
+                            )}
+                            {t.womenOnly && (
+                              <span className="rounded-full bg-pink-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-pink-300">
+                                🚺 Women
+                              </span>
+                            )}
+                            {t.seriesId && (
+                              <span className="rounded-full bg-indigo-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-300">
+                                🔁 Daily
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {fmtDateTime(t.departAt)} · {t.seatsAvailable}/{t.seatsTotal} seats left
+                          </div>
+                        </div>
                       </div>
-                      <span className="border-2 border-black bg-[#FBBF24] px-2 py-0.5 font-mono text-xs font-bold">
-                        {formatINR(t.pricePerSeat)}/seat
-                      </span>
+                      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-right">
+                        <div className="font-mono text-xs font-bold text-emerald-300">
+                          {formatINR(t.pricePerSeat)}
+                        </div>
+                        <div className="text-[9px] text-emerald-400/70">per seat</div>
+                      </div>
                     </div>
 
-                    <div className="mt-1.5 truncate text-xs font-bold">
-                      <span className="mr-1 inline-block h-2 w-2 border border-black bg-[#22C55E]" />
-                      {t.from.label}
-                    </div>
-                    <div className="truncate text-xs font-bold">
-                      <span className="mr-1 inline-block h-2 w-2 border border-black bg-[#EF4444]" />
-                      {t.to.label}
+                    <div className="mt-3 space-y-1.5 rounded-xl bg-slate-950/40 p-2.5 text-xs">
+                      <div className="flex items-center gap-2 truncate text-slate-200">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                        <span className="truncate">{t.from.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2 truncate text-slate-300">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-rose-400" />
+                        <span className="truncate">{t.to.label}</span>
+                      </div>
                     </div>
 
-                    <div className="mt-2 flex items-center justify-between gap-2 border-t border-black/15 pt-2 font-mono text-[11px]">
-                      <span>
-                        {fmtDateTime(t.departAt)} · {t.seatsAvailable}/{t.seatsTotal} seats
-                      </span>
-                      <div className="flex gap-1">
+                    <div className="mt-3 flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          props.onSelectTrip(t.id);
+                          props.onOpenActive();
+                        }}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                      >
+                        View Route
+                      </button>
+                      {mine ? (
+                        <span className="rounded-xl border border-indigo-500/30 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold capitalize text-indigo-300">
+                          {mine.status}
+                        </span>
+                      ) : (
                         <button
                           type="button"
-                          onClick={() => {
-                            props.onSelectTrip(t.id);
-                            props.onOpenActive();
-                          }}
-                          className="border-2 border-black bg-white px-2 py-0.5 font-bold uppercase hover:bg-[#FBBF24]"
+                          disabled={props.busy || t.seatsAvailable < seatReq || t.driverId === props.user.uid}
+                          onClick={() => props.onRequestSeats(t, seatReq)}
+                          className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:brightness-110 disabled:opacity-40"
                         >
-                          Map
+                          Book {seatReq} · {formatINR(seatReq * t.pricePerSeat)}
                         </button>
-                        {mine ? (
-                          <span className="border-2 border-black bg-black px-2 py-0.5 font-bold uppercase text-[#FBBF24]">
-                            {mine.status}
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={props.busy || t.seatsAvailable < seatReq || t.driverId === props.user.uid}
-                            onClick={() => props.onRequestSeats(t, seatReq)}
-                            className="border-2 border-black bg-[#FBBF24] px-2.5 py-0.5 font-bold uppercase hover:bg-black hover:text-[#FBBF24] disabled:opacity-40"
-                          >
-                            Book {seatReq} · {formatINR(seatReq * t.pricePerSeat)}
-                          </button>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </li>
                 );
@@ -540,32 +594,38 @@ function PlannerView(
 function MyTripsList(props: CarpoolHUDProps & { onOpenActive: () => void }) {
   if (props.mode === 'rider') {
     if (props.myBookings.length === 0) {
-      return <Block className="p-4 text-center text-xs font-bold">You have no seat bookings yet.</Block>;
+      return (
+        <Card className="p-6 text-center text-xs text-slate-400">
+          You don&apos;t have any seat bookings yet.
+        </Card>
+      );
     }
     return (
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {props.myBookings.map((b) => (
-          <li key={b.id} className="border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000]">
+          <li key={b.id} className="rounded-2xl border border-white/10 bg-slate-800/60 p-3.5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-xs font-bold">
+              <span className="font-mono text-xs font-bold text-white">
                 {b.seats} seat(s) · {formatINR(b.fare)}
               </span>
-              <span className="border-2 border-black bg-[#FBBF24] px-2 py-0.5 font-mono text-[10px] font-bold uppercase">
+              <span className="rounded-full border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-indigo-300">
                 {b.status}
               </span>
             </div>
-            <div className="mt-1 truncate text-xs font-bold">From: {b.fromLabel}</div>
-            <div className="truncate text-xs font-bold">To: {b.toLabel}</div>
-            <div className="mt-2 flex items-center justify-between font-mono text-[11px]">
+            <div className="mt-2 space-y-1 text-xs text-slate-300">
+              <div className="truncate">🟢 {b.fromLabel}</div>
+              <div className="truncate">🔴 {b.toLabel}</div>
+            </div>
+            <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-slate-400">
               <span>{fmtDateTime(b.departAt)}</span>
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     props.onSelectTrip(b.tripId);
                     props.onOpenActive();
                   }}
-                  className="border-2 border-black bg-black px-2 py-0.5 font-bold uppercase text-[#FBBF24]"
+                  className="rounded-xl bg-indigo-500 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-600"
                 >
                   Open Live
                 </button>
@@ -573,7 +633,7 @@ function MyTripsList(props: CarpoolHUDProps & { onOpenActive: () => void }) {
                   <button
                     type="button"
                     onClick={() => props.onCancelMyBooking(b, MAX_SEATS)}
-                    className="border-2 border-black bg-white px-2 py-0.5 font-bold uppercase"
+                    className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-rose-500/20 hover:text-rose-200"
                   >
                     Cancel
                   </button>
@@ -587,22 +647,28 @@ function MyTripsList(props: CarpoolHUDProps & { onOpenActive: () => void }) {
   }
 
   if (props.driverTrips.length === 0) {
-    return <Block className="p-4 text-center text-xs font-bold">You haven&apos;t posted any trips yet.</Block>;
+    return (
+      <Card className="p-6 text-center text-xs text-slate-400">
+        You haven&apos;t published any trips yet.
+      </Card>
+    );
   }
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2.5">
       {props.driverTrips.map((t) => (
-        <li key={t.id} className="border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000]">
+        <li key={t.id} className="rounded-2xl border border-white/10 bg-slate-800/60 p-3.5">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold">
+            <span className="font-mono text-xs font-bold text-white">
               {t.seatsAvailable}/{t.seatsTotal} seats left · {formatINR(t.pricePerSeat)}/seat
             </span>
-            <span className="border-2 border-black bg-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-[#FBBF24]">
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-emerald-300">
               {t.status}
             </span>
           </div>
-          <div className="mt-1 truncate text-xs font-bold">{t.from.label} → {t.to.label}</div>
-          <div className="mt-2 flex items-center justify-between font-mono text-[11px]">
+          <div className="mt-2 truncate text-xs text-slate-300">
+            {t.from.label} → {t.to.label}
+          </div>
+          <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-slate-400">
             <span>{fmtDateTime(t.departAt)}</span>
             <button
               type="button"
@@ -610,7 +676,7 @@ function MyTripsList(props: CarpoolHUDProps & { onOpenActive: () => void }) {
                 props.onSelectTrip(t.id);
                 props.onOpenActive();
               }}
-              className="border-2 border-black bg-[#FBBF24] px-2.5 py-0.5 font-bold uppercase"
+              className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-3 py-1 text-xs font-semibold text-white shadow-sm"
             >
               Manage / Drive
             </button>
@@ -643,70 +709,85 @@ function ActiveTripView(props: CarpoolHUDProps & { trip: Trip }) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3.5">
       <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => props.onSelectTrip(null)}
-          className="border-2 border-black bg-white px-2 py-0.5 font-mono text-[11px] font-bold uppercase"
+          className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
         >
           ← Back
         </button>
-        <span className="border-2 border-black bg-[#FBBF24] px-2 py-0.5 font-mono text-[11px] font-bold uppercase">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 font-mono text-xs font-bold uppercase text-emerald-300">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
           {trip.status} · {pct}%
         </span>
       </div>
 
-      <Block className="p-3 space-y-1.5">
-        <div className="flex items-center justify-between text-xs font-bold">
-          <span>
-            Driver: {trip.driverName} {trip.driverVerified ? '✓' : ''}
+      <Card className="space-y-2.5 p-4">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-white">
+            Driver: {trip.driverName}{' '}
+            {trip.driverVerified && <span className="text-emerald-400">✓</span>}
           </span>
-          <span>
+          <span className="font-mono font-semibold text-indigo-300">
             {trip.seatsAvailable}/{trip.seatsTotal} seats · {formatINR(trip.pricePerSeat)}/seat
           </span>
         </div>
         {trip.vehicle && (
-          <div className="font-mono text-[11px] text-black/70">
-            Vehicle: {trip.vehicle.color} {trip.vehicle.model} · {trip.vehicle.plate}
+          <div className="inline-block rounded-lg border border-white/10 bg-slate-950/50 px-2.5 py-1 font-mono text-[11px] text-slate-300">
+            🚘 {trip.vehicle.color} {trip.vehicle.model} · {trip.vehicle.plate}
           </div>
         )}
-        <div className="truncate text-xs font-bold">🟢 {trip.from.label}</div>
-        <div className="truncate text-xs font-bold">🔴 {trip.to.label}</div>
+        <div className="space-y-1 rounded-xl bg-slate-950/40 p-2.5 text-xs">
+          <div className="truncate text-slate-200">🟢 {trip.from.label}</div>
+          <div className="truncate text-slate-300">🔴 {trip.to.label}</div>
+        </div>
         {trip.status === 'in_transit' && (
-          <div className="h-4 border-2 border-black bg-white">
-            <div className="h-full bg-[#22C55E] transition-[width] duration-700" style={{ width: `${pct}%` }} />
+          <div className="h-2.5 overflow-hidden rounded-full bg-slate-950">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-[width] duration-700"
+              style={{ width: `${pct}%` }}
+            />
           </div>
         )}
-      </Block>
+      </Card>
 
       {/* Driver controls & incoming seat requests */}
       {isDriver && (
-        <Block className="p-3 space-y-2">
-          <div className={LABEL}>Driver Controls & Seat Requests ({props.tripBookings.length})</div>
+        <Card className="space-y-2.5 p-4">
+          <div className={LABEL}>Passenger Requests ({props.tripBookings.length})</div>
           {props.tripBookings.length === 0 ? (
-            <div className="text-xs text-black/60">No seat requests yet.</div>
+            <div className="text-xs text-slate-400">No seat requests yet.</div>
           ) : (
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {props.tripBookings.map((b) => (
-                <li key={b.id} className="flex items-center justify-between border border-black p-2 text-xs">
+                <li
+                  key={b.id}
+                  className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 p-2.5 text-xs"
+                >
                   <div>
-                    <span className="font-bold">{b.riderName}</span> ({b.seats} seat · {formatINR(b.fare)})
-                    <span className="ml-1 font-mono text-[10px] uppercase text-black/60">[{b.status}]</span>
+                    <span className="font-bold text-white">{b.riderName}</span>{' '}
+                    <span className="text-slate-300">
+                      ({b.seats} seat · {formatINR(b.fare)})
+                    </span>
+                    <span className="ml-1.5 rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-slate-300">
+                      {b.status}
+                    </span>
                   </div>
                   {b.status === 'pending' && (
-                    <div className="flex gap-1">
+                    <div className="flex gap-1.5">
                       <button
                         type="button"
                         onClick={() => props.onAcceptBooking(b)}
-                        className="border border-black bg-[#22C55E] px-2 py-0.5 font-mono text-[10px] font-bold"
+                        className="rounded-lg bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-slate-950 hover:bg-emerald-400"
                       >
                         Accept
                       </button>
                       <button
                         type="button"
                         onClick={() => props.onRejectBooking(b)}
-                        className="border border-black bg-[#EF4444] px-2 py-0.5 font-mono text-[10px] font-bold text-white"
+                        className="rounded-lg bg-rose-500/20 px-2.5 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-500/30"
                       >
                         Reject
                       </button>
@@ -729,13 +810,13 @@ function ActiveTripView(props: CarpoolHUDProps & { trip: Trip }) {
               </button>
             )}
           </div>
-        </Block>
+        </Card>
       )}
 
       {/* Safety Bar: Share Live Link + SOS */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         <button type="button" onClick={copyShare} className={BTN_GHOST}>
-          {copied ? '✓ Link Copied' : '🔗 Share Live Trip'}
+          {copied ? '✓ Link Copied' : '🔗 Share Live Ride'}
         </button>
         <button type="button" onClick={props.onTriggerSos} className={BTN_DANGER}>
           🚨 SOS ({EMERGENCY_NUMBER} / {WOMEN_HELPLINE})
@@ -743,16 +824,16 @@ function ActiveTripView(props: CarpoolHUDProps & { trip: Trip }) {
       </div>
 
       {/* In-Ride Realtime Chat */}
-      <Block className="p-2.5 space-y-2">
-        <div className={LABEL}>In-Ride Chat</div>
-        <div className="max-h-32 space-y-1 overflow-y-auto border border-black/20 bg-[#F5F5F0] p-2 text-xs">
+      <Card className="space-y-2.5 p-3.5">
+        <div className={LABEL}>In-Ride Carpool Chat</div>
+        <div className="max-h-36 space-y-1.5 overflow-y-auto rounded-xl border border-white/5 bg-slate-950/60 p-2.5 text-xs">
           {props.chatMessages.length === 0 ? (
-            <div className="text-black/50">Coordinate pickup point with your carpool here.</div>
+            <div className="text-slate-500">Coordinate pickup point with your carpool here…</div>
           ) : (
             props.chatMessages.map((m) => (
-              <div key={m.id}>
-                <span className="font-bold">{m.name}: </span>
-                <span>{m.text}</span>
+              <div key={m.id} className="rounded-lg bg-slate-900/90 px-2.5 py-1.5">
+                <span className="font-bold text-indigo-300">{m.name}: </span>
+                <span className="text-slate-200">{m.text}</span>
               </div>
             ))
           )}
@@ -765,19 +846,22 @@ function ActiveTripView(props: CarpoolHUDProps & { trip: Trip }) {
             setMsg('');
             await props.onSendChat(text);
           }}
-          className="flex"
+          className="flex gap-2"
         >
           <input
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
             placeholder="Message carpool…"
-            className="min-w-0 flex-1 border-2 border-r-0 border-black px-2 py-1 text-xs outline-none"
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
           />
-          <button type="submit" className="border-2 border-black bg-[#0A0A0A] px-3 font-mono text-xs font-bold text-[#FBBF24]">
+          <button
+            type="submit"
+            className="rounded-xl bg-indigo-500 px-4 text-xs font-semibold text-white transition hover:bg-indigo-600"
+          >
             Send
           </button>
         </form>
-      </Block>
+      </Card>
     </div>
   );
 }
@@ -797,17 +881,27 @@ function LocationRow({
   onActivate: () => void;
   onClear: () => void;
 }) {
-  const color = target === 'from' ? 'bg-[#22C55E]' : 'bg-[#EF4444]';
+  const dotColor =
+    target === 'from'
+      ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]'
+      : 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.8)]';
   return (
-    <div className={`flex items-stretch border-2 border-black ${active ? 'bg-[#FBBF24]' : 'bg-white'}`}>
-      <button type="button" onClick={onActivate} className="flex min-w-0 flex-1 items-center gap-2.5 p-2.5 text-left">
-        <span className={`inline-block h-3 w-3 shrink-0 border-2 border-black ${color}`} />
+    <div
+      className={`flex items-stretch rounded-2xl border transition ${
+        active
+          ? 'border-indigo-500/70 bg-indigo-500/10 shadow-sm shadow-indigo-500/10'
+          : 'border-white/10 bg-slate-800/50 hover:border-white/20'
+      }`}
+    >
+      <button type="button" onClick={onActivate} className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left">
+        <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dotColor}`} />
         <span className="min-w-0">
-          <span className={`block ${LABEL} ${active ? 'text-black' : ''}`}>
-            {target === 'from' ? 'Origin' : 'Destination'} {active ? '· tap map or search' : ''}
+          <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            {target === 'from' ? 'Pickup Location' : 'Dropoff Location'}{' '}
+            {active && <span className="text-indigo-300">· tap map or search</span>}
           </span>
-          <span className={`block truncate text-xs font-bold ${place ? '' : 'text-black/40'}`}>
-            {place ? place.label : target === 'from' ? 'Select origin…' : 'Select destination…'}
+          <span className={`mt-0.5 block truncate text-xs font-semibold ${place ? 'text-white' : 'text-slate-500'}`}>
+            {place ? place.label : target === 'from' ? 'Choose pickup point…' : 'Choose destination…'}
           </span>
         </span>
       </button>
@@ -815,7 +909,7 @@ function LocationRow({
         <button
           type="button"
           onClick={onClear}
-          className="border-l-2 border-black px-2.5 font-mono text-sm font-bold hover:bg-black hover:text-white"
+          className="border-l border-white/10 px-3 text-sm text-slate-400 transition hover:text-white"
         >
           ×
         </button>
@@ -855,18 +949,18 @@ function PlaceSearch({ target, onPick }: { target: Target; onPick: (place: Place
 
   return (
     <div className="relative">
-      <div className="flex border-2 border-black bg-white">
-        <span className="flex items-center border-r-2 border-black px-2.5 font-mono text-xs font-bold">⌕</span>
+      <div className="flex items-center rounded-2xl border border-white/10 bg-slate-950/70 px-3 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+        <span className="text-sm text-slate-400">🔍</span>
         <input
           value={term}
           onChange={(e) => setTerm(e.target.value)}
-          placeholder={`Search ${target === 'from' ? 'origin' : 'destination'} in Jaipur…`}
-          className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-xs font-medium outline-none"
+          placeholder={`Search ${target === 'from' ? 'pickup' : 'destination'} in Jaipur…`}
+          className="min-w-0 flex-1 bg-transparent px-2.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none"
         />
-        {loading && <span className="flex items-center px-2 font-mono text-[10px]">…</span>}
+        {loading && <span className="text-xs text-indigo-400">Searching…</span>}
       </div>
       {results.length > 0 && (
-        <div className="absolute inset-x-0 top-full z-20 mt-1 max-h-48 overflow-y-auto border-2 border-black bg-white shadow-[4px_4px_0px_0px_#000]">
+        <div className="absolute inset-x-0 top-full z-20 mt-1.5 max-h-52 overflow-y-auto rounded-2xl border border-white/15 bg-slate-900/95 p-1 shadow-2xl backdrop-blur-xl">
           {results.map((r) => (
             <button
               key={`${r.position[0]},${r.position[1]}`}
@@ -876,9 +970,9 @@ function PlaceSearch({ target, onPick }: { target: Target; onPick: (place: Place
                 setTerm('');
                 setResults([]);
               }}
-              className="block w-full border-b border-black/10 px-3 py-1.5 text-left text-xs font-medium hover:bg-[#FBBF24]"
+              className="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-200 transition hover:bg-indigo-500/20 hover:text-white"
             >
-              {r.label}
+              📍 {r.label}
             </button>
           ))}
         </div>

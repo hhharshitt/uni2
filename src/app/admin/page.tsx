@@ -41,153 +41,205 @@ export default function AdminPage() {
   const openSos = sosList.filter((s) => !s.resolved);
 
   return (
-    <main className="min-h-[100dvh] bg-[#F5F5F0] text-black">
-      <header className="flex h-14 items-center justify-between border-b-2 border-black bg-[#0A0A0A] px-4 text-white">
-        <div className="flex items-center gap-3">
-          <span className="border-2 border-black bg-[#FBBF24] px-2 py-0.5 font-mono text-xs font-bold text-black">
-            ADMIN
-          </span>
-          <span className="font-bold uppercase tracking-wider">Uniride Control Center</span>
-        </div>
-        <Link
-          href="/"
-          className="border-2 border-black bg-[#FBBF24] px-3 py-1 font-mono text-xs font-bold uppercase text-black"
-        >
-          ← Back to Map
-        </Link>
-      </header>
+    <main className="min-h-[100dvh] bg-[#090D16] text-slate-100">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-600/15 blur-[130px]" />
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-[130px]" />
+      </div>
 
-      <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-6">
-        {/* Stat cards */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]">
-            <div className="font-mono text-[10px] font-bold uppercase text-black/60">Registered Users</div>
-            <div className="mt-1 font-mono text-3xl font-bold">{users.length}</div>
-          </div>
-          <div className="border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]">
-            <div className="font-mono text-[10px] font-bold uppercase text-black/60">Trips (Completed)</div>
-            <div className="mt-1 font-mono text-3xl font-bold">
-              {trips.length} <span className="text-sm">({completedTrips})</span>
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-900/80 px-4 py-3.5 backdrop-blur-xl md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white shadow-md shadow-indigo-500/30">
+              UR
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">UniRide Control Center</span>
+                <span className="rounded-full border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-indigo-300">
+                  Admin
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-400">Live Telemetry, Verification & Safety Operations</div>
             </div>
           </div>
-          <div className="border-2 border-black bg-[#FBBF24] p-4 shadow-[4px_4px_0px_0px_#000]">
-            <div className="font-mono text-[10px] font-bold uppercase text-black/60">Seat Volume</div>
-            <div className="mt-1 font-mono text-3xl font-bold">{formatINR(totalVolume)}</div>
+          <Link
+            href="/"
+            className="rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white"
+          >
+            ← Back to Live Map
+          </Link>
+        </div>
+      </header>
+
+      <div className="relative z-10 mx-auto max-w-6xl space-y-6 p-4 md:p-6">
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-xl backdrop-blur-xl">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Registered Users
+            </div>
+            <div className="mt-2 font-mono text-3xl font-bold text-white">{users.length}</div>
           </div>
-          <div className="border-2 border-black bg-[#EF4444] p-4 text-white shadow-[4px_4px_0px_0px_#000]">
-            <div className="font-mono text-[10px] font-bold uppercase">Active SOS Alerts</div>
-            <div className="mt-1 font-mono text-3xl font-bold">{openSos.length}</div>
+          <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-xl backdrop-blur-xl">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Total Trips (Done)
+            </div>
+            <div className="mt-2 font-mono text-3xl font-bold text-white">
+              {trips.length} <span className="text-sm font-normal text-slate-400">({completedTrips})</span>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/20 to-violet-600/10 p-5 shadow-xl backdrop-blur-xl">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">
+              Carpool Volume
+            </div>
+            <div className="mt-2 font-mono text-3xl font-bold text-white">{formatINR(totalVolume)}</div>
+          </div>
+          <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500/20 to-red-600/10 p-5 shadow-xl backdrop-blur-xl">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-rose-300">
+              Active SOS Alerts
+            </div>
+            <div className="mt-2 font-mono text-3xl font-bold text-rose-200">{openSos.length}</div>
           </div>
         </div>
 
         {/* Navigation tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="inline-flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-slate-900/80 p-1.5 backdrop-blur-xl">
           {(['overview', 'users', 'trips', 'sos'] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={`border-2 border-black px-4 py-2 font-mono text-xs font-bold uppercase shadow-[3px_3px_0px_0px_#000] ${
-                tab === t ? 'bg-[#FBBF24]' : 'bg-white'
+              className={`rounded-xl px-4 py-2 text-xs font-semibold capitalize transition ${
+                tab === t
+                  ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              {t}
+              {t === 'sos' ? 'SOS Alerts' : t}
             </button>
           ))}
         </div>
 
         {tab === 'overview' && (
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]">
-              <h2 className="font-mono text-xs font-bold uppercase">Recent Bookings ({bookings.length})</h2>
-              <ul className="mt-3 space-y-2 text-xs">
-                {bookings.slice(0, 10).map((b) => (
-                  <li key={b.id} className="flex items-center justify-between border-b border-black/15 pb-1.5">
-                    <span>
-                      <strong>{b.riderName}</strong> · {b.fromLabel} → {b.toLabel} ({b.seats} seat)
-                    </span>
-                    <span className="font-mono font-bold uppercase">
-                      {formatINR(b.fare)} [{b.status}]
-                    </span>
-                  </li>
-                ))}
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-xl backdrop-blur-xl">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                Recent Bookings ({bookings.length})
+              </h2>
+              <ul className="mt-4 space-y-2.5 text-xs">
+                {bookings.length === 0 ? (
+                  <li className="text-slate-500">No bookings recorded yet.</li>
+                ) : (
+                  bookings.slice(0, 10).map((b) => (
+                    <li
+                      key={b.id}
+                      className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-950/50 px-3.5 py-2.5"
+                    >
+                      <span className="truncate pr-2 text-slate-300">
+                        <strong className="text-white">{b.riderName}</strong> · {b.fromLabel} → {b.toLabel} (
+                        {b.seats} seat)
+                      </span>
+                      <span className="shrink-0 rounded-lg bg-indigo-500/15 px-2.5 py-1 font-mono text-[11px] font-semibold text-indigo-300">
+                        {formatINR(b.fare)} · {b.status}
+                      </span>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
 
-            <div className="border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]">
-              <h2 className="font-mono text-xs font-bold uppercase">SOS Feed ({sosList.length})</h2>
-              <ul className="mt-3 space-y-2 text-xs">
-                {sosList.slice(0, 8).map((s) => (
-                  <li key={s.id} className="flex items-center justify-between border-b border-black/15 pb-1.5">
-                    <span>
-                      🚨 <strong>{s.name}</strong> ({s.phone}) · Trip {s.tripId}
-                    </span>
-                    {s.resolved ? (
-                      <span className="font-mono text-[10px] uppercase text-black/50">Resolved</span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => resolveSos(s.id)}
-                        className="border border-black bg-[#22C55E] px-2 py-0.5 font-mono text-[10px] font-bold"
-                      >
-                        Mark Resolved
-                      </button>
-                    )}
-                  </li>
-                ))}
+            <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-xl backdrop-blur-xl">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                SOS Feed ({sosList.length})
+              </h2>
+              <ul className="mt-4 space-y-2.5 text-xs">
+                {sosList.length === 0 ? (
+                  <li className="text-slate-500">No SOS alerts triggered.</li>
+                ) : (
+                  sosList.slice(0, 8).map((s) => (
+                    <li
+                      key={s.id}
+                      className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-950/50 px-3.5 py-2.5"
+                    >
+                      <span className="text-slate-300">
+                        🚨 <strong className="text-white">{s.name}</strong> ({s.phone}) · Trip {s.tripId}
+                      </span>
+                      {s.resolved ? (
+                        <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-slate-400">
+                          Resolved
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => resolveSos(s.id)}
+                          className="rounded-lg bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-slate-950 hover:bg-emerald-400"
+                        >
+                          Mark Resolved
+                        </button>
+                      )}
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>
         )}
 
         {tab === 'users' && (
-          <div className="overflow-x-auto border-2 border-black bg-white shadow-[4px_4px_0px_0px_#000]">
+          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/80 shadow-xl backdrop-blur-xl">
             <table className="w-full text-left text-xs">
-              <thead className="border-b-2 border-black bg-[#0A0A0A] font-mono uppercase text-white">
+              <thead className="border-b border-white/10 bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 <tr>
-                  <th className="p-3">Name / College ID</th>
-                  <th className="p-3">Email / Phone</th>
-                  <th className="p-3">Role</th>
-                  <th className="p-3">Verified</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-4">Name / College ID</th>
+                  <th className="p-4">Email / Phone</th>
+                  <th className="p-4">Role</th>
+                  <th className="p-4">Verification</th>
+                  <th className="p-4">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {users.map((u) => (
-                  <tr key={u.uid} className="border-b border-black/15">
-                    <td className="p-3 font-bold">
-                      {u.name} <span className="font-mono text-[10px] text-black/60">({u.collegeId || '—'})</span>
+                  <tr key={u.uid} className="hover:bg-white/[0.02]">
+                    <td className="p-4 font-semibold text-white">
+                      {u.name}{' '}
+                      <span className="ml-1 font-mono text-[11px] font-normal text-slate-400">
+                        ({u.collegeId || '—'})
+                      </span>
                     </td>
-                    <td className="p-3 font-mono">
+                    <td className="p-4 font-mono text-slate-300">
                       {u.email} · {u.phone}
                     </td>
-                    <td className="p-3">
+                    <td className="p-4">
                       <select
                         value={u.role}
                         onChange={(e) => adminUpdateUser(u.uid, { role: e.target.value as Role })}
-                        className="border border-black px-2 py-1 font-mono text-xs font-bold"
+                        className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1 font-mono text-xs font-semibold text-slate-200 outline-none focus:border-indigo-500"
                       >
                         <option value="rider">rider</option>
                         <option value="driver">driver</option>
                         <option value="admin">admin</option>
                       </select>
                     </td>
-                    <td className="p-3">
+                    <td className="p-4">
                       <button
                         type="button"
                         onClick={() => adminUpdateUser(u.uid, { verified: !u.verified })}
-                        className={`border border-black px-2 py-0.5 font-mono text-[10px] font-bold ${
-                          u.verified ? 'bg-[#22C55E]' : 'bg-white'
+                        className={`rounded-full px-3 py-1 text-[11px] font-semibold transition ${
+                          u.verified
+                            ? 'border border-emerald-500/30 bg-emerald-500/15 text-emerald-300'
+                            : 'border border-white/10 bg-white/5 text-slate-400 hover:text-white'
                         }`}
                       >
                         {u.verified ? '✓ Verified' : 'Unverified'}
                       </button>
                     </td>
-                    <td className="p-3">
+                    <td className="p-4">
                       <button
                         type="button"
                         onClick={() => adminDeleteUser(u.uid)}
-                        className="border border-black bg-[#EF4444] px-2 py-0.5 font-mono text-[10px] font-bold text-white"
+                        className="rounded-lg border border-rose-500/30 bg-rose-500/15 px-2.5 py-1 text-[11px] font-semibold text-rose-300 transition hover:bg-rose-500/30"
                       >
                         Delete
                       </button>
@@ -200,27 +252,30 @@ export default function AdminPage() {
         )}
 
         {tab === 'trips' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {trips.map((t) => (
               <div
                 key={t.id}
-                className="flex flex-wrap items-center justify-between gap-2 border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000] text-xs"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-slate-900/80 p-4 text-xs shadow-lg backdrop-blur-xl"
               >
-                <div>
-                  <strong>{t.driverName}</strong> · {t.from.label} → {t.to.label} ({t.seatsAvailable}/{t.seatsTotal}{' '}
-                  seats · {formatINR(t.pricePerSeat)}/seat) [{t.status}]
+                <div className="text-slate-300">
+                  <strong className="text-white">{t.driverName}</strong> · {t.from.label} → {t.to.label} (
+                  {t.seatsAvailable}/{t.seatsTotal} seats · {formatINR(t.pricePerSeat)}/seat){' '}
+                  <span className="ml-1.5 rounded-full bg-indigo-500/15 px-2 py-0.5 font-mono text-[10px] uppercase text-indigo-300">
+                    {t.status}
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   <Link
                     href={`/track/${encodeURIComponent(t.id)}`}
-                    className="border border-black bg-[#FBBF24] px-2 py-1 font-mono text-[10px] font-bold uppercase"
+                    className="rounded-xl border border-indigo-500/30 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/25"
                   >
-                    Track
+                    Live Track
                   </Link>
                   <button
                     type="button"
                     onClick={() => deleteTrip(t.id)}
-                    className="border border-black bg-[#EF4444] px-2 py-1 font-mono text-[10px] font-bold uppercase text-white"
+                    className="rounded-xl border border-rose-500/30 bg-rose-500/15 px-3 py-1.5 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/25"
                   >
                     Delete
                   </button>
@@ -231,16 +286,19 @@ export default function AdminPage() {
         )}
 
         {tab === 'sos' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {sosList.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000] text-xs"
+                className="flex items-center justify-between rounded-2xl border border-rose-500/20 bg-slate-900/80 p-4 text-xs shadow-lg backdrop-blur-xl"
               >
-                <div>
-                  🚨 <strong>{s.name}</strong> ({s.phone}) · Trip <code className="font-mono">{s.tripId}</code>
+                <div className="text-slate-300">
+                  🚨 <strong className="text-white">{s.name}</strong> ({s.phone}) · Trip{' '}
+                  <code className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-indigo-300">
+                    {s.tripId}
+                  </code>
                   {s.location && (
-                    <span className="ml-2 font-mono">
+                    <span className="ml-2 font-mono text-slate-400">
                       [{s.location[0].toFixed(4)}, {s.location[1].toFixed(4)}]
                     </span>
                   )}
@@ -249,9 +307,9 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => resolveSos(s.id)}
-                    className="border-2 border-black bg-[#22C55E] px-3 py-1 font-mono text-xs font-bold uppercase"
+                    className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
                   >
-                    Resolve
+                    Resolve Alert
                   </button>
                 )}
               </div>
@@ -262,4 +320,3 @@ export default function AdminPage() {
     </main>
   );
 }
-

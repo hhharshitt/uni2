@@ -1,37 +1,36 @@
 import type { Metadata, Viewport } from 'next';
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import './globals.css';
 
-const spaceGrotesk = Space_Grotesk({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['500', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-display',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['500', '700'],
+  weight: ['500', '600'],
   variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
-  title: 'Uniride // Jaipur Tactical Cab Dispatch',
-  description: 'Realtime student & commuter cab dispatch across Jaipur powered by OSRM, Nominatim, and Firebase.',
+  title: 'UniRide — Smart Campus Carpool & Live Ride Share',
+  description: 'Verified student carpooling and real-time ride dispatch across Jaipur powered by OSRM, Nominatim, and Firebase.',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#FBBF24',
+  themeColor: '#0F172A',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body className="antialiased selection:bg-[#FBBF24] selection:text-black">{children}</body>
+    <html lang="en" className={`${jakarta.variable} ${jetbrainsMono.variable} dark`}>
+      <body className="antialiased selection:bg-indigo-500 selection:text-white">{children}</body>
     </html>
   );
 }
-
