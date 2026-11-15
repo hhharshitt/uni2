@@ -552,8 +552,84 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Live Device Hardware GPS state
+  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
+  const [locatingGps, setLocatingGps] = useState(false);
+  const [useRealGps, setUseRealGps] = useState(true);
+  const initialGpsSetRef = useRef(false);
+
   const activeTripRef = useRef<Trip | null>(null);
   activeTripRef.current = activeTrip;
+
+  // Continuous high-accuracy device GPS watcher for both Student & Driver
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('geolocation' in navigator)) return;
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const coords: LatLng = [round6(pos.coords.latitude), round6(pos.coords.longitude)];
+        setUserLocation(coords);
+        setGpsAccuracy(pos.coords.accuracy ?? null);
+
+        // Automatically set initial pickup location on first GPS lock
+        if (!initialGpsSetRef.current) {
+          initialGpsSetRef.current = true;
+          setFrom((cur) => {
+            if (cur) return cur;
+            reverseGeocode(coords).then((label) => {
+              setFrom((latest) =>
+                latest && latest.position[0] === coords[0] && latest.position[1] === coords[1]
+                  ? { label, position: coords }
+                  : latest,
+              );
+            });
+            return { label: 'Current GPS Location…', position: coords };
+          });
+          setSelecting('to');
+          setFocus({ position: coords, key: Date.now() });
+        }
+      },
+      () => {
+        // User denied or GPS unavailable; keep manual/map selection available
+      },
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+
+  const handleUseMyLocation = useCallback(
+    (target: Target = selecting) => {
+      if (typeof window === 'undefined' || !('geolocation' in navigator)) {
+        setError('Geolocation is not supported by your browser.');
+        return;
+      }
+      setLocatingGps(true);
+      setError(null);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords: LatLng = [round6(pos.coords.latitude), round6(pos.coords.longitude)];
+          setUserLocation(coords);
+          setGpsAccuracy(pos.coords.accuracy ?? null);
+          const setter = target === 'from' ? setFrom : setTo;
+          setter({ label: 'Locating street address…', position: coords });
+          reverseGeocode(coords).then((label) => setter({ label, position: coords }));
+          if (target === 'from') setSelecting('to');
+          setFocus({ position: coords, key: Date.now() });
+          setLocatingGps(false);
+        },
+        (err) => {
+          setLocatingGps(false);
+          setError(
+            err.code === 1
+              ? 'Location permission denied. Enable location access in your browser settings.'
+              : 'Could not get high-accuracy GPS fix. Check if device location/GPS is turned on.',
+          );
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 },
+      );
+    },
+    [selecting],
+  );
 
   // Subscriptions
   useEffect(() => subscribeUpcomingTrips(setUpcomingTrips), []);
@@ -604,17 +680,56 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
     return () => ctrl.abort();
   }, [fLat, fLng, tLat, tLng, routeNonce]);
 
-  // Driver live GPS simulation along the polyline when trip is in_transit
+  // Driver live GPS streaming (real hardware GPS by default, or route simulator fallback)
   const tripStatus = activeTrip?.status;
   const tripStartedAt = activeTrip?.tripStartedAt ?? null;
   const simDurationMs = activeTrip?.simDurationMs ?? 45000;
   const routeLen = activeTrip?.routeCoordinates.length ?? 0;
 
+  // Stream real hardware GPS when driver is in_transit and useRealGps is enabled
   useEffect(() => {
     if (
       !activeTrip ||
       activeTrip.driverId !== user.uid ||
       tripStatus !== 'in_transit' ||
+      !useRealGps ||
+      typeof window === 'undefined' ||
+      !('geolocation' in navigator)
+    ) {
+      return;
+    }
+    const id = activeTrip.id;
+    const dropPos = activeTrip.to.position;
+    if (userLocation) {
+      updateDriverLocation(id, [round6(userLocation[0]), round6(userLocation[1])]).catch(() => {});
+    }
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const livePos: LatLng = [round6(pos.coords.latitude), round6(pos.coords.longitude)];
+        setUserLocation(livePos);
+        setGpsAccuracy(pos.coords.accuracy ?? null);
+        updateDriverLocation(id, livePos).catch((e) => setError(describeFirebaseError(e)));
+        if (haversine(livePos, dropPos) <= 50) {
+          completeTrip(id, livePos).catch((e) => setError(describeFirebaseError(e)));
+        }
+      },
+      () => {
+        // If hardware GPS fails mid-trip, fall back to simulator
+        setUseRealGps(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTrip?.id, activeTrip?.driverId, user.uid, tripStatus, useRealGps]);
+
+  // Route simulator when useRealGps is disabled
+  useEffect(() => {
+    if (
+      !activeTrip ||
+      activeTrip.driverId !== user.uid ||
+      tripStatus !== 'in_transit' ||
+      useRealGps ||
       !tripStartedAt ||
       routeLen < 2
     ) {
@@ -634,7 +749,7 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
       updateDriverLocation(id, [round6(p[0]), round6(p[1])]).catch((e) => setError(describeFirebaseError(e)));
     }, 1000);
     return () => clearInterval(interval);
-  }, [activeTrip?.id, activeTrip?.driverId, user.uid, tripStatus, tripStartedAt, simDurationMs, routeLen]);
+  }, [activeTrip?.id, activeTrip?.driverId, user.uid, tripStatus, tripStartedAt, simDurationMs, routeLen, useRealGps]);
 
   // Filter upcoming trips by origin/destination proximity & women-only toggle
   const filteredTrips = useMemo(() => {
@@ -692,12 +807,25 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
           drop={mapDrop}
           route={mapRoute}
           driverLocation={activeTrip?.driverLocation ?? null}
+          userLocation={userLocation}
+          userAccuracy={gpsAccuracy}
           onMapClick={handleMapClick}
           clickEnabled={!activeTrip}
           followDriver={activeTrip?.status === 'in_transit'}
           focus={focus}
         />
       </div>
+
+      {/* Floating Re-Center GPS Button on Map */}
+      <button
+        type="button"
+        onClick={() => handleUseMyLocation(selecting)}
+        title="Use my live device GPS location"
+        className="pointer-events-auto absolute right-3 top-[68px] z-[1100] flex items-center gap-1.5 rounded-2xl border border-white/15 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-sky-300 shadow-xl backdrop-blur-xl transition hover:bg-slate-800 md:right-4 md:top-[164px]"
+      >
+        <span>🎯</span>
+        <span className="hidden sm:inline">{locatingGps ? 'Locating…' : 'My GPS'}</span>
+      </button>
 
       {/* Floating Glass Top Navigation Bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[1100] p-2 md:p-4">
@@ -870,7 +998,11 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
           onTriggerSos={async () => {
             if (!activeTrip) return;
             try {
-              await raiseSos(activeTrip.id, user, activeTrip.driverLocation ?? activeTrip.from.position);
+              await raiseSos(
+                activeTrip.id,
+                user,
+                userLocation ?? activeTrip.driverLocation ?? activeTrip.from.position,
+              );
               alert('🚨 SOS Alert broadcast to Admin Control Center!');
             } catch (e) {
               setError(describeFirebaseError(e));
@@ -880,6 +1012,12 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
           busy={busy}
           error={error}
           onClearError={() => setError(null)}
+          userLocation={userLocation}
+          gpsAccuracy={gpsAccuracy}
+          locatingGps={locatingGps}
+          onUseMyLocation={handleUseMyLocation}
+          useRealGps={useRealGps}
+          onToggleRealGps={setUseRealGps}
         />
       </div>
     </main>

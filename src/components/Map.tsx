@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect, useRef } from 'react';
-import { MapContainer, Marker, Polyline, TileLayer, ZoomControl, useMap, useMapEvents } from 'react-leaflet';
+import { Circle, MapContainer, Marker, Polyline, TileLayer, ZoomControl, useMap, useMapEvents } from 'react-leaflet';
 import { JAIPUR_CENTER, JAIPUR_ZOOM, bearing, haversine } from '@/lib/fare';
 import type { LatLng } from '@/lib/types';
 
@@ -17,6 +17,8 @@ export interface MapProps {
   drop: LatLng | null;
   route: LatLng[];
   driverLocation: LatLng | null;
+  userLocation?: LatLng | null;
+  userAccuracy?: number | null;
   onMapClick?: (position: LatLng) => void;
   clickEnabled?: boolean;
   followDriver?: boolean;
@@ -90,6 +92,19 @@ const cabIcon = L.divIcon({
   html: CAB_HTML,
   iconSize: [48, 48],
   iconAnchor: [24, 24],
+});
+
+const USER_GPS_HTML = `
+  <div style="position:relative;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+    <span style="position:absolute;inset:0;border-radius:9999px;background:rgba(56,189,248,0.35);animation:ping 1.8s cubic-bezier(0,0,0.2,1) infinite;"></span>
+    <span style="position:relative;width:14px;height:14px;border-radius:9999px;background:#0EA5E9;border:2.5px solid #FFFFFF;box-shadow:0 0 12px rgba(14,165,233,0.9);"></span>
+  </div>`;
+
+const userGpsIcon = L.divIcon({
+  className: 'uni-icon',
+  html: USER_GPS_HTML,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
 });
 
 // ---------------------------------------------------------------- behaviours
@@ -193,6 +208,8 @@ export default function LiveMap({
   drop,
   route,
   driverLocation,
+  userLocation = null,
+  userAccuracy = null,
   onMapClick,
   clickEnabled = false,
   followDriver = false,
@@ -232,6 +249,14 @@ export default function LiveMap({
         </>
       )}
 
+      {userLocation && userAccuracy && userAccuracy < 1500 && (
+        <Circle
+          center={userLocation}
+          radius={Math.max(15, userAccuracy)}
+          pathOptions={{ color: '#38BDF8', weight: 1, fillColor: '#38BDF8', fillOpacity: 0.12 }}
+        />
+      )}
+      {userLocation && <Marker position={userLocation} icon={userGpsIcon} zIndexOffset={900} keyboard={false} />}
       {pickup && <Marker position={pickup} icon={pickupIcon} keyboard={false} />}
       {drop && <Marker position={drop} icon={dropIcon} keyboard={false} />}
       {driverLocation && <CabMarker position={driverLocation} follow={followDriver} />}

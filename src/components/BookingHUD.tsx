@@ -6,6 +6,7 @@ import { JAIPUR_PLACES, RATE_PER_KM, formatINR, searchPlaces } from '@/lib/fare'
 import type {
   Booking,
   ChatMessage,
+  LatLng,
   Place,
   RouteResult,
   Trip,
@@ -64,6 +65,13 @@ export interface CarpoolHUDProps {
   busy: boolean;
   error: string | null;
   onClearError: () => void;
+  // Live Device GPS
+  userLocation?: LatLng | null;
+  gpsAccuracy?: number | null;
+  locatingGps?: boolean;
+  onUseMyLocation?: (target?: Target) => void;
+  useRealGps?: boolean;
+  onToggleRealGps?: (v: boolean) => void;
 }
 
 const BTN_BASE =
@@ -238,6 +246,28 @@ function PlannerView(
 
   return (
     <div className="space-y-3.5">
+      {/* Live Device GPS Bar */}
+      <div className="flex items-center justify-between gap-2 rounded-2xl border border-sky-500/30 bg-sky-500/10 px-3 py-2">
+        <div className="flex min-w-0 items-center gap-2 text-xs">
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-sky-400" />
+          <span className="truncate font-medium text-sky-200">
+            {props.userLocation
+              ? `Device GPS Locked${props.gpsAccuracy ? ` (±${Math.round(props.gpsAccuracy)}m)` : ''}`
+              : 'Use your device GPS for exact pickup'}
+          </span>
+        </div>
+        <button
+          type="button"
+          disabled={props.locatingGps}
+          onClick={() => props.onUseMyLocation?.(props.selecting)}
+          className="shrink-0 rounded-xl bg-sky-500 px-3 py-1.5 text-[11px] font-bold text-slate-950 shadow-sm transition hover:bg-sky-400 disabled:opacity-50"
+        >
+          {props.locatingGps
+            ? 'Locating…'
+            : `📍 Set ${props.selecting === 'from' ? 'Pickup' : 'Dropoff'}`}
+        </button>
+      </div>
+
       {/* Route Endpoints */}
       <div className="relative space-y-2">
         <LocationRow
@@ -819,6 +849,19 @@ function ActiveTripView(props: CarpoolHUDProps & { trip: Trip }) {
               ))}
             </ul>
           )}
+
+          <div className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2 text-xs">
+            <span className="font-medium text-slate-300">
+              {props.useRealGps ? '🛰 Streaming Real Device GPS' : '▶️ Route Demo Simulator'}
+            </span>
+            <button
+              type="button"
+              onClick={() => props.onToggleRealGps?.(!props.useRealGps)}
+              className="rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-1 text-[11px] font-semibold text-indigo-300 hover:bg-indigo-500/25"
+            >
+              Switch to {props.useRealGps ? 'Simulator' : 'Real GPS'}
+            </button>
+          </div>
 
           <div className="flex gap-2 pt-1">
             {trip.status === 'scheduled' && (
