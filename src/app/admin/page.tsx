@@ -111,11 +111,10 @@ export default function AdminPage() {
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={`rounded-xl px-4 py-2 text-xs font-semibold capitalize transition ${
-                tab === t
+              className={`rounded-xl px-4 py-2 text-xs font-semibold capitalize transition ${tab === t
                   ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25'
                   : 'text-slate-400 hover:text-white'
-              }`}
+                }`}
             >
               {t === 'sos' ? 'SOS Alerts' : t}
             </button>
@@ -188,67 +187,121 @@ export default function AdminPage() {
         )}
 
         {tab === 'users' && (
-          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/80 shadow-xl backdrop-blur-xl">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-white/10 bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                <tr>
-                  <th className="p-4">Name / College ID</th>
-                  <th className="p-4">Email / Phone</th>
-                  <th className="p-4">Role</th>
-                  <th className="p-4">Verification</th>
-                  <th className="p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {users.map((u) => (
-                  <tr key={u.uid} className="hover:bg-white/[0.02]">
-                    <td className="p-4 font-semibold text-white">
-                      {u.name}{' '}
-                      <span className="ml-1 font-mono text-[11px] font-normal text-slate-400">
-                        ({u.collegeId || '—'})
-                      </span>
-                    </td>
-                    <td className="p-4 font-mono text-slate-300">
-                      {u.email} · {u.phone}
-                    </td>
-                    <td className="p-4">
-                      <select
-                        value={u.role}
-                        onChange={(e) => adminUpdateUser(u.uid, { role: e.target.value as Role })}
-                        className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1 font-mono text-xs font-semibold text-slate-200 outline-none focus:border-indigo-500"
-                      >
-                        <option value="rider">rider</option>
-                        <option value="driver">driver</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </td>
-                    <td className="p-4">
-                      <button
-                        type="button"
-                        onClick={() => adminUpdateUser(u.uid, { verified: !u.verified })}
-                        className={`rounded-full px-3 py-1 text-[11px] font-semibold transition ${
-                          u.verified
-                            ? 'border border-emerald-500/30 bg-emerald-500/15 text-emerald-300'
-                            : 'border border-white/10 bg-white/5 text-slate-400 hover:text-white'
+          <>
+            {/* Mobile Card List */}
+            <div className="space-y-3 md:hidden">
+              {users.map((u) => (
+                <div
+                  key={u.uid}
+                  className="space-y-3 rounded-2xl border border-white/10 bg-slate-900/80 p-4 text-xs shadow-lg backdrop-blur-xl"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate font-bold text-white">
+                        {u.name}{' '}
+                        <span className="font-mono text-[11px] font-normal text-slate-400">
+                          ({u.collegeId || '—'})
+                        </span>
+                      </div>
+                      <div className="mt-0.5 truncate font-mono text-[11px] text-slate-400">
+                        {u.email} {u.phone ? `· ${u.phone}` : ''}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => adminUpdateUser(u.uid, { verified: !u.verified })}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${u.verified
+                          ? 'border border-emerald-500/30 bg-emerald-500/15 text-emerald-300'
+                          : 'border border-white/10 bg-white/5 text-slate-400'
                         }`}
-                      >
-                        {u.verified ? '✓ Verified' : 'Unverified'}
-                      </button>
-                    </td>
-                    <td className="p-4">
-                      <button
-                        type="button"
-                        onClick={() => adminDeleteUser(u.uid)}
-                        className="rounded-lg border border-rose-500/30 bg-rose-500/15 px-2.5 py-1 text-[11px] font-semibold text-rose-300 transition hover:bg-rose-500/30"
-                      >
-                        Delete
-                      </button>
-                    </td>
+                    >
+                      {u.verified ? '✓ Verified' : 'Unverified'}
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 border-t border-white/10 pt-2.5">
+                    <select
+                      value={u.role}
+                      onChange={(e) => adminUpdateUser(u.uid, { role: e.target.value as Role })}
+                      className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1.5 font-mono text-xs font-semibold text-slate-200 outline-none"
+                    >
+                      <option value="rider">rider</option>
+                      <option value="driver">driver</option>
+                      <option value="admin">admin</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => adminDeleteUser(u.uid)}
+                      className="rounded-lg border border-rose-500/30 bg-rose-500/15 px-3 py-1.5 text-xs font-semibold text-rose-300"
+                    >
+                      Delete User
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/80 shadow-xl backdrop-blur-xl md:block">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-white/10 bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  <tr>
+                    <th className="p-4">Name / College ID</th>
+                    <th className="p-4">Email / Phone</th>
+                    <th className="p-4">Role</th>
+                    <th className="p-4">Verification</th>
+                    <th className="p-4">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {users.map((u) => (
+                    <tr key={u.uid} className="hover:bg-white/[0.02]">
+                      <td className="p-4 font-semibold text-white">
+                        {u.name}{' '}
+                        <span className="ml-1 font-mono text-[11px] font-normal text-slate-400">
+                          ({u.collegeId || '—'})
+                        </span>
+                      </td>
+                      <td className="p-4 font-mono text-slate-300">
+                        {u.email} · {u.phone}
+                      </td>
+                      <td className="p-4">
+                        <select
+                          value={u.role}
+                          onChange={(e) => adminUpdateUser(u.uid, { role: e.target.value as Role })}
+                          className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1 font-mono text-xs font-semibold text-slate-200 outline-none focus:border-indigo-500"
+                        >
+                          <option value="rider">rider</option>
+                          <option value="driver">driver</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          type="button"
+                          onClick={() => adminUpdateUser(u.uid, { verified: !u.verified })}
+                          className={`rounded-full px-3 py-1 text-[11px] font-semibold transition ${u.verified
+                              ? 'border border-emerald-500/30 bg-emerald-500/15 text-emerald-300'
+                              : 'border border-white/10 bg-white/5 text-slate-400 hover:text-white'
+                            }`}
+                        >
+                          {u.verified ? '✓ Verified' : 'Unverified'}
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          type="button"
+                          onClick={() => adminDeleteUser(u.uid)}
+                          className="rounded-lg border border-rose-500/30 bg-rose-500/15 px-2.5 py-1 text-[11px] font-semibold text-rose-300 transition hover:bg-rose-500/30"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {tab === 'trips' && (

@@ -211,7 +211,7 @@ function AuthScreen({
       if (!isSignup && !authUser) {
         const signedIn = await signInWithEmailAndPassword(auth, email.trim(), password);
         const existing = await getProfile(signedIn.user.uid);
-        await setOwnRole(signedIn.user.uid, role).catch(() => {});
+        await setOwnRole(signedIn.user.uid, role).catch(() => { });
         const baseProfile: UserProfile = existing ?? {
           uid: signedIn.user.uid,
           name: signedIn.user.displayName || email.trim().split('@')[0] || 'Student',
@@ -258,11 +258,11 @@ function AuthScreen({
         vehicle:
           role === 'driver'
             ? {
-                model: carModel.trim() || 'Hatchback',
-                plate: carPlate.trim() || 'RJ14-XX-0000',
-                color: carColor.trim(),
-                seats: 4,
-              }
+              model: carModel.trim() || 'Hatchback',
+              plate: carPlate.trim() || 'RJ14-XX-0000',
+              color: carColor.trim(),
+              seats: 4,
+            }
             : null,
       };
 
@@ -270,7 +270,7 @@ function AuthScreen({
 
       const verified = isAllowedEmail(email) && collegeId.trim().length >= 5;
       if (verified) {
-        await markVerified(cred.user.uid).catch(() => {});
+        await markVerified(cred.user.uid).catch(() => { });
       }
 
       onProfileReady({
@@ -292,39 +292,39 @@ function AuthScreen({
   const labelCls = 'block text-[11px] font-semibold uppercase tracking-wider text-slate-400';
 
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#090D16] px-4 py-10 text-slate-100">
+    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#090D16] px-3 py-6 text-slate-100 sm:px-4 sm:py-10">
       {/* Ambient background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-600/20 blur-[120px]" />
         <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900/80 p-6 shadow-glass-lg backdrop-blur-2xl sm:p-8">
+      <div className="relative z-10 w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900/85 p-5 shadow-glass-lg backdrop-blur-2xl sm:p-8">
         {/* Brand Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 font-bold text-white shadow-lg shadow-indigo-500/30">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 font-bold text-white shadow-lg shadow-indigo-500/30">
               UR
             </div>
             <div>
-              <div className="text-lg font-extrabold tracking-tight text-white">UniRide</div>
-              <div className="text-xs text-slate-400">Jaipur Smart Campus Carpool</div>
+              <div className="text-base font-extrabold tracking-tight text-white sm:text-lg">UniRide</div>
+              <div className="text-[11px] text-slate-400 sm:text-xs">Jaipur Smart Campus Carpool</div>
             </div>
           </div>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
+          <span className="shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300 sm:px-3 sm:text-[11px]">
             ✓ MUJ Verified
           </span>
         </div>
 
         {/* Feature Chips */}
-        <div className="mt-5 flex flex-wrap gap-2">
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-300">
+        <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto pb-1 sm:mt-5 sm:flex-wrap sm:gap-2">
+          <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-300">
             ⚡ Instant Fare Split
           </span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-300">
+          <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-300">
             📍 Live OSRM GPS
           </span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-300">
+          <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-300">
             🛡 Women-Only & SOS
           </span>
         </div>
@@ -335,22 +335,20 @@ function AuthScreen({
             <button
               type="button"
               onClick={() => setIsSignup(false)}
-              className={`rounded-xl py-2 text-xs font-semibold transition ${
-                !isSignup
+              className={`rounded-xl py-2 text-xs font-semibold transition ${!isSignup
                   ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25'
                   : 'text-slate-400 hover:text-white'
-              }`}
+                }`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => setIsSignup(true)}
-              className={`rounded-xl py-2 text-xs font-semibold transition ${
-                isSignup
+              className={`rounded-xl py-2 text-xs font-semibold transition ${isSignup
                   ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25'
                   : 'text-slate-400 hover:text-white'
-              }`}
+                }`}
             >
               Create Account
             </button>
@@ -371,11 +369,10 @@ function AuthScreen({
               <button
                 type="button"
                 onClick={() => setRole('rider')}
-                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                  role === 'rider'
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${role === 'rider'
                     ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
                     : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <span>🎓</span>
                 <span>Student</span>
@@ -383,11 +380,10 @@ function AuthScreen({
               <button
                 type="button"
                 onClick={() => setRole('driver')}
-                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                  role === 'driver'
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${role === 'driver'
                     ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
                     : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <span>🚗</span>
                 <span>Driver</span>
@@ -447,7 +443,7 @@ function AuthScreen({
                 </label>
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                 <label className="block">
                   <span className={labelCls}>Gender</span>
                   <select
@@ -459,16 +455,6 @@ function AuthScreen({
                     <option value="male" className="bg-slate-900">Male</option>
                     <option value="other" className="bg-slate-900">Other</option>
                   </select>
-                </label>
-                <label className="block">
-                  <span className={labelCls}>College ID</span>
-                  <input
-                    required
-                    value={collegeId}
-                    onChange={(e) => setCollegeId(e.target.value)}
-                    placeholder="23FE10CSE00"
-                    className={`${inputCls} font-mono`}
-                  />
                 </label>
                 <label className="block">
                   <span className={labelCls}>Year</span>
@@ -483,6 +469,16 @@ function AuthScreen({
                     <option className="bg-slate-900">4th Year</option>
                   </select>
                 </label>
+                <label className="col-span-2 block sm:col-span-1">
+                  <span className={labelCls}>College ID</span>
+                  <input
+                    required
+                    value={collegeId}
+                    onChange={(e) => setCollegeId(e.target.value)}
+                    placeholder="23FE10CSE00"
+                    className={`${inputCls} font-mono`}
+                  />
+                </label>
               </div>
 
               {role === 'driver' && (
@@ -490,26 +486,26 @@ function AuthScreen({
                   <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-indigo-300">
                     Vehicle Details
                   </div>
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                     <input
                       required
                       value={carModel}
                       onChange={(e) => setCarModel(e.target.value)}
-                      placeholder="Swift / i20"
-                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
+                      placeholder="Car Model (e.g. Swift / i20)"
+                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
                     />
                     <input
                       required
                       value={carPlate}
                       onChange={(e) => setCarPlate(e.target.value)}
-                      placeholder="RJ14-CA-1234"
-                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2 font-mono text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
+                      placeholder="Plate (RJ14-CA-1234)"
+                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2.5 font-mono text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
                     />
                     <input
                       value={carColor}
                       onChange={(e) => setCarColor(e.target.value)}
-                      placeholder="Color"
-                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
+                      placeholder="Color (e.g. White)"
+                      className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -704,16 +700,16 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
       </div>
 
       {/* Floating Glass Top Navigation Bar */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-[1100] p-2.5 md:p-4">
-        <div className="pointer-events-auto mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border border-white/10 bg-slate-900/85 px-3.5 shadow-2xl backdrop-blur-xl md:px-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white shadow-md shadow-indigo-500/30">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-[1100] p-2 md:p-4">
+        <div className="pointer-events-auto mx-auto flex h-12 max-w-7xl items-center justify-between gap-2 rounded-2xl border border-white/10 bg-slate-900/90 px-2.5 shadow-2xl backdrop-blur-xl sm:h-14 sm:px-5">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white shadow-md shadow-indigo-500/30 sm:h-9 sm:w-9">
               UR
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-sm font-bold tracking-tight text-white">UniRide</span>
-                <span className="hidden rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-slate-300 sm:inline-block">
+                <span className="max-w-[90px] truncate rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-slate-300 sm:max-w-[160px]">
                   {user.name}
                 </span>
                 {user.verified && (
@@ -722,34 +718,34 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
                   </span>
                 )}
               </div>
-              <div className="text-[10px] text-slate-400 hidden sm:block">Jaipur Campus Mobility Network</div>
+              <div className="hidden text-[10px] text-slate-400 sm:block">Jaipur Campus Mobility Network</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="rounded-xl border border-indigo-500/30 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-300">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <span className="rounded-xl border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-1 text-[11px] font-semibold text-indigo-300 sm:px-3 sm:py-1.5 sm:text-xs">
               {mode === 'driver' ? '🚗 Driver' : '🎓 Student'}
             </span>
 
             <Link
               href="/admin"
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
+              className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-slate-200 transition hover:bg-white/10 sm:px-3 sm:py-1.5 sm:text-xs"
             >
               Admin
             </Link>
             <button
               type="button"
               onClick={() => signOut(getFirebaseAuth())}
-              className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20"
+              className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 transition hover:bg-rose-500/20 sm:px-3 sm:py-1.5 sm:text-xs"
             >
-              Sign Out
+              Exit
             </button>
           </div>
         </div>
       </header>
 
-      {/* HUD */}
-      <div className="pointer-events-none absolute inset-x-2.5 bottom-2.5 z-[1100] flex max-h-[65dvh] flex-col justify-end md:inset-x-auto md:bottom-4 md:left-4 md:top-[80px] md:max-h-none md:w-[430px] md:justify-start">
+      {/* HUD: Bottom Sheet on mobile, Floating Panel on desktop */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1100] flex max-h-[70dvh] flex-col justify-end md:inset-x-auto md:bottom-4 md:left-4 md:top-[80px] md:max-h-none md:w-[430px] md:justify-start">
         <BookingHUD
           user={user}
           mode={mode}

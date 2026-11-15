@@ -103,48 +103,67 @@ export default function BookingHUD(props: CarpoolHUDProps) {
   const savedEntries = Object.entries(props.user.savedPlaces ?? {});
 
   return (
-    <section className="pointer-events-auto flex max-h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/90 text-slate-100 shadow-glass-lg backdrop-blur-2xl">
+    <section className="pointer-events-auto flex max-h-full min-h-0 flex-col overflow-hidden rounded-t-3xl border-t border-white/15 bg-slate-900/95 text-slate-100 shadow-glass-lg backdrop-blur-2xl md:rounded-3xl md:border md:border-white/10 md:bg-slate-900/90">
+      {/* Mobile Bottom-Sheet Pull Handle */}
+      <button
+        type="button"
+        aria-label="Toggle bottom sheet"
+        onClick={() => setCollapsed((c) => !c)}
+        className="flex w-full items-center justify-center bg-slate-950/50 pt-2 pb-0.5 md:hidden"
+      >
+        <span className="h-1.5 w-11 rounded-full bg-white/25" />
+      </button>
+
       {/* Console Top Header & Tabs */}
-      <div className="flex items-center justify-between border-b border-white/10 bg-slate-950/50 px-4 py-3">
+      <div className="flex items-center justify-between gap-2 border-b border-white/10 bg-slate-950/50 px-3.5 py-2.5 sm:px-4 sm:py-3">
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}
-          className="flex items-center gap-2 text-left text-xs font-bold text-white"
+          className="flex min-w-0 items-center gap-2 text-left text-xs font-bold text-white"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-sm">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-sm">
             {props.mode === 'rider' ? '🎓' : '🚗'}
           </span>
-          <span>{props.mode === 'rider' ? 'Student Console' : 'Driver Console'}</span>
-          <span className="text-slate-400 md:hidden">{collapsed ? '▲' : '▼'}</span>
+          <span className="truncate">{props.mode === 'rider' ? 'Student Console' : 'Driver Console'}</span>
+          <span className="text-[10px] text-slate-400 md:hidden">{collapsed ? '▲ Expand' : '▼ Map'}</span>
         </button>
 
-        <div className="flex rounded-xl border border-white/10 bg-slate-900/90 p-0.5">
+        <div className="flex shrink-0 rounded-xl border border-white/10 bg-slate-900/90 p-0.5">
           <button
             type="button"
-            onClick={() => setTab('plan')}
+            onClick={() => {
+              setTab('plan');
+              setCollapsed(false);
+            }}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
               tab === 'plan'
                 ? 'bg-indigo-500 text-white shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {props.mode === 'rider' ? 'Explore' : 'Post Ride'}
+            {props.mode === 'rider' ? 'Explore' : 'Post'}
           </button>
           <button
             type="button"
-            onClick={() => setTab('trips')}
+            onClick={() => {
+              setTab('trips');
+              setCollapsed(false);
+            }}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
               tab === 'trips'
                 ? 'bg-indigo-500 text-white shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            My Rides ({props.mode === 'rider' ? props.myBookings.length : props.driverTrips.length})
+            My ({props.mode === 'rider' ? props.myBookings.length : props.driverTrips.length})
           </button>
           {props.activeTrip && (
             <button
               type="button"
-              onClick={() => setTab('active')}
+              onClick={() => {
+                setTab('active');
+                setCollapsed(false);
+              }}
               className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
                 tab === 'active'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
@@ -159,7 +178,11 @@ export default function BookingHUD(props: CarpoolHUDProps) {
       </div>
 
       {/* Console Body */}
-      <div className={`${collapsed ? 'hidden md:block' : 'block'} min-h-0 space-y-3.5 overflow-y-auto overscroll-contain p-4`}>
+      <div
+        className={`${
+          collapsed ? 'hidden md:block' : 'block'
+        } safe-bottom min-h-0 space-y-3.5 overflow-y-auto overscroll-contain p-3.5 sm:p-4`}
+      >
         {props.error && (
           <div className="flex items-start justify-between gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/15 px-3.5 py-2.5 text-xs font-medium text-rose-200">
             <span>⚠️ {props.error}</span>
@@ -265,11 +288,11 @@ function PlannerView(
           )}
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1 md:flex-wrap">
           {props.savedEntries.map(([name, place]) => (
             <span
               key={name}
-              className="inline-flex items-center overflow-hidden rounded-full border border-amber-400/30 bg-amber-400/15 text-[11px] font-semibold text-amber-300"
+              className="inline-flex shrink-0 items-center overflow-hidden rounded-full border border-amber-400/30 bg-amber-400/15 text-[11px] font-semibold text-amber-300"
             >
               <button
                 type="button"
@@ -292,7 +315,7 @@ function PlannerView(
               key={p.label}
               type="button"
               onClick={() => props.onPlacePicked(props.selecting, p)}
-              className="rounded-full border border-white/10 bg-slate-800/70 px-3 py-1 text-[11px] font-medium text-slate-300 transition hover:border-indigo-500/40 hover:bg-indigo-500/20 hover:text-white"
+              className="shrink-0 rounded-full border border-white/10 bg-slate-800/70 px-3 py-1 text-[11px] font-medium text-slate-300 transition hover:border-indigo-500/40 hover:bg-indigo-500/20 hover:text-white"
             >
               {p.label}
             </button>

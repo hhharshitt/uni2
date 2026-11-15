@@ -50,27 +50,27 @@ export default function PublicTrackPage({ params }: { params: { tripId: string }
         />
       </div>
 
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-[1100] p-3 md:p-4">
-        <div className="pointer-events-auto mx-auto flex h-14 max-w-5xl items-center justify-between rounded-2xl border border-white/10 bg-slate-900/85 px-4 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-[1100] p-2.5 md:p-4">
+        <div className="pointer-events-auto mx-auto flex h-12 max-w-5xl items-center justify-between gap-2 rounded-2xl border border-white/10 bg-slate-900/90 px-3 shadow-2xl backdrop-blur-xl sm:h-14 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white">
               UR
             </div>
-            <div>
-              <div className="text-xs font-bold text-white">UniRide Live Safety Share</div>
-              <div className="font-mono text-[10px] text-slate-400">Trip ID: {tripId}</div>
+            <div className="min-w-0">
+              <div className="truncate text-xs font-bold text-white">UniRide Live Safety Share</div>
+              <div className="truncate font-mono text-[10px] text-slate-400">Trip ID: {tripId}</div>
             </div>
           </div>
           <Link
             href="/"
-            className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:brightness-110"
+            className="shrink-0 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:brightness-110"
           >
             Open App
           </Link>
         </div>
       </header>
 
-      <div className="absolute inset-x-3 bottom-3 z-[1100] max-w-md rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-glass-lg backdrop-blur-2xl md:left-4 md:bottom-4">
+      <div className="safe-bottom absolute inset-x-0 bottom-0 z-[1100] max-w-md rounded-t-3xl border-t border-white/15 bg-slate-900/95 p-4 shadow-glass-lg backdrop-blur-2xl md:left-4 md:bottom-4 md:rounded-3xl md:border md:border-white/10 md:p-5">
         {!loaded ? (
           <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-300">
             <span className="h-2 w-2 animate-ping rounded-full bg-indigo-400" />
