@@ -211,24 +211,27 @@ function AuthScreen({
       if (!isSignup && !authUser) {
         const signedIn = await signInWithEmailAndPassword(auth, email.trim(), password);
         const existing = await getProfile(signedIn.user.uid);
-        onProfileReady(
-          existing ?? {
-            uid: signedIn.user.uid,
-            name: signedIn.user.displayName || email.trim().split('@')[0] || 'Student',
-            email: email.trim(),
-            phone: '',
-            role: 'rider',
-            gender: 'other',
-            college: 'Manipal University Jaipur',
-            collegeId: '',
-            branch: 'CSE',
-            year: '3rd Year',
-            vehicle: null,
-            verified: isAllowedEmail(email),
-            createdAt: Date.now(),
-            savedPlaces: {},
-          },
-        );
+        await setOwnRole(signedIn.user.uid, role).catch(() => {});
+        const baseProfile: UserProfile = existing ?? {
+          uid: signedIn.user.uid,
+          name: signedIn.user.displayName || email.trim().split('@')[0] || 'Student',
+          email: email.trim(),
+          phone: '',
+          role,
+          gender: 'other',
+          college: 'Manipal University Jaipur',
+          collegeId: '',
+          branch: 'CSE',
+          year: '3rd Year',
+          vehicle: null,
+          verified: isAllowedEmail(email),
+          createdAt: Date.now(),
+          savedPlaces: {},
+        };
+        onProfileReady({
+          ...baseProfile,
+          role: baseProfile.role === 'admin' ? 'admin' : role,
+        });
         return;
       }
 
@@ -362,16 +365,46 @@ function AuthScreen({
         )}
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+          <div>
+            <span className={labelCls}>{isSignup ? 'Register As' : 'Login As'}</span>
+            <div className="mt-1.5 grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => setRole('rider')}
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                  role === 'rider'
+                    ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
+                    : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
+                }`}
+              >
+                <span>🎓</span>
+                <span>Student</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('driver')}
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                  role === 'driver'
+                    ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
+                    : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
+                }`}
+              >
+                <span>🚗</span>
+                <span>Driver</span>
+              </button>
+            </div>
+          </div>
+
           {!authUser && (
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
               <label className="block">
-                <span className={labelCls}>College Email</span>
+                <span className={labelCls}>{role === 'driver' ? 'Email' : 'College Email'}</span>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@muj.manipal.edu"
+                  placeholder={role === 'driver' ? 'driver@example.com' : 'you@muj.manipal.edu'}
                   className={inputCls}
                 />
               </label>
@@ -391,36 +424,6 @@ function AuthScreen({
 
           {isSignup && (
             <>
-              <div>
-                <span className={labelCls}>Select Your Mode</span>
-                <div className="mt-1.5 grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setRole('rider')}
-                    className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                      role === 'rider'
-                        ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
-                        : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
-                    }`}
-                  >
-                    <span>🎓</span>
-                    <span>Student Rider</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('driver')}
-                    className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                      role === 'driver'
-                        ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-sm'
-                        : 'border-white/10 bg-slate-950/50 text-slate-400 hover:border-white/20 hover:text-slate-200'
-                    }`}
-                  >
-                    <span>🚗</span>
-                    <span>Student Driver</span>
-                  </button>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelCls}>Full Name</span>
@@ -530,7 +533,7 @@ function AuthScreen({
 // ================================================================ Main Carpool Console
 
 function CarpoolConsole({ user }: { user: UserProfile }) {
-  const [mode, setMode] = useState<'rider' | 'driver'>(user.role === 'driver' ? 'driver' : 'rider');
+  const mode: 'rider' | 'driver' = user.role === 'driver' ? 'driver' : 'rider';
   const [from, setFrom] = useState<Place | null>(null);
   const [to, setTo] = useState<Place | null>(null);
   const [selecting, setSelecting] = useState<Target>('from');
@@ -724,37 +727,9 @@ function CarpoolConsole({ user }: { user: UserProfile }) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Segmented Rider / Driver Pill */}
-            <div className="flex rounded-xl border border-white/10 bg-slate-950/70 p-0.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('rider');
-                  if (user.role !== 'admin') setOwnRole(user.uid, 'rider').catch(() => {});
-                }}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                  mode === 'rider'
-                    ? 'bg-indigo-500 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                🎓 Rider
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('driver');
-                  if (user.role !== 'admin') setOwnRole(user.uid, 'driver').catch(() => {});
-                }}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                  mode === 'driver'
-                    ? 'bg-indigo-500 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                🚗 Driver
-              </button>
-            </div>
+            <span className="rounded-xl border border-indigo-500/30 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-300">
+              {mode === 'driver' ? '🚗 Driver' : '🎓 Student'}
+            </span>
 
             <Link
               href="/admin"

@@ -313,6 +313,10 @@ export function updateProfile(uid: string, patch: ProfilePatch): Promise<void> {
 }
 
 export function setOwnRole(uid: string, role: Exclude<Role, 'admin'>): Promise<void> {
+  const cached = readCachedProfile(uid);
+  if (cached && cached.role !== 'admin') {
+    writeCachedProfile(uid, { ...cached, role });
+  }
   return setDoc(doc(getDb(), 'users', uid), { role }, { merge: true });
 }
 

@@ -114,7 +114,7 @@ export default function BookingHUD(props: CarpoolHUDProps) {
           <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-sm">
             {props.mode === 'rider' ? '🎓' : '🚗'}
           </span>
-          <span>{props.mode === 'rider' ? 'Rider Console' : 'Driver Host'}</span>
+          <span>{props.mode === 'rider' ? 'Student Console' : 'Driver Console'}</span>
           <span className="text-slate-400 md:hidden">{collapsed ? '▲' : '▼'}</span>
         </button>
 
@@ -490,8 +490,7 @@ function PlannerView(
 
           {props.upcomingTrips.length === 0 ? (
             <Card className="p-5 text-center text-xs text-slate-400">
-              No matching carpools right now. Try clearing endpoints or switch to{' '}
-              <span className="font-semibold text-indigo-300">Driver</span> mode to post a ride.
+              No matching carpools right now. Try clearing pickup/dropoff filters to see all upcoming rides.
             </Card>
           ) : (
             <ul className="space-y-2.5">
