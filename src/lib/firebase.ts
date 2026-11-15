@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { getDatabase, type Database } from 'firebase/database';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 // NEXT_PUBLIC_* values must be referenced literally so Next.js inlines them into the client bundle.
 const firebaseConfig = {
@@ -14,12 +14,10 @@ const firebaseConfig = {
     process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || 'https://unirideweb-default-rtdb.firebaseio.com',
 };
 
-export const isFirebaseConfigured = Boolean(
-  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.databaseURL,
-);
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
 
 let app: FirebaseApp | null = null;
-let database: Database | null = null;
+let firestoreDb: Firestore | null = null;
 let auth: Auth | null = null;
 
 function getFirebaseApp(): FirebaseApp {
@@ -30,9 +28,9 @@ function getFirebaseApp(): FirebaseApp {
   return app;
 }
 
-export function getDb(): Database {
-  if (!database) database = getDatabase(getFirebaseApp());
-  return database;
+export function getDb(): Firestore {
+  if (!firestoreDb) firestoreDb = getFirestore(getFirebaseApp());
+  return firestoreDb;
 }
 
 export function getFirebaseAuth(): Auth {
@@ -43,8 +41,8 @@ export function getFirebaseAuth(): Auth {
 export function describeFirebaseError(err: unknown): string {
   const message = err instanceof Error ? err.message : String(err);
   const code = (err as { code?: string } | null)?.code ?? '';
-  if (/permission[_ ]denied/i.test(message)) {
-    return 'Permission denied by Firebase rules. Publish database.rules.json in the Firebase console.';
+  if (/permission[_ -]denied|insufficient permissions/i.test(message)) {
+    return 'Permission denied by Firebase security rules.';
   }
   switch (code) {
     case 'auth/invalid-credential':
@@ -52,7 +50,7 @@ export function describeFirebaseError(err: unknown): string {
     case 'auth/user-not-found':
       return 'Incorrect email or password.';
     case 'auth/email-already-in-use':
-      return 'An account with this email already exists. Log in instead.';
+      return 'An account with this email already exists. Sign in instead.';
     case 'auth/weak-password':
       return 'Password must be at least 6 characters.';
     case 'auth/invalid-email':
@@ -60,7 +58,7 @@ export function describeFirebaseError(err: unknown): string {
     case 'auth/too-many-requests':
       return 'Too many attempts. Wait a minute and try again.';
     case 'auth/network-request-failed':
-      return 'Network error. Check your connection.';
+      return 'Network error. Check your internet connection.';
     case 'auth/operation-not-allowed':
       return 'Email/Password sign-in is disabled. Enable it in Firebase console → Authentication.';
     default:

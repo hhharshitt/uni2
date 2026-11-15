@@ -20,6 +20,7 @@ import {
   completeTrip,
   createProfile,
   createTrips,
+  getProfile,
   markVerified,
   raiseSos,
   rejectBooking,
@@ -83,25 +84,61 @@ export default function HomePage() {
       setAuthReady(true);
       return;
     }
-    return onAuthStateChanged(getFirebaseAuth(), (u) => {
-      setAuthUser(u);
-      if (!u) {
-        setProfile(null);
-        setAuthReady(true);
-      }
-    });
+    const safetyTimer = setTimeout(() => setAuthReady(true), 2500);
+    const unsub = onAuthStateChanged(
+      getFirebaseAuth(),
+      (u) => {
+        setAuthUser(u);
+        if (!u) {
+          setProfile(null);
+          setAuthReady(true);
+        }
+      },
+      () => setAuthReady(true),
+    );
+    return () => {
+      clearTimeout(safetyTimer);
+      unsub();
+    };
   }, []);
 
   useEffect(() => {
     if (!authUser) return;
-    return subscribeProfile(
+    const fallbackProfile: UserProfile = {
+      uid: authUser.uid,
+      name: authUser.displayName || authUser.email?.split('@')[0] || 'Student',
+      email: authUser.email || '',
+      phone: '',
+      role: 'rider',
+      gender: 'other',
+      college: 'Manipal University Jaipur',
+      collegeId: '',
+      branch: 'CSE',
+      year: '3rd Year',
+      vehicle: null,
+      verified: isAllowedEmail(authUser.email || ''),
+      createdAt: Date.now(),
+      savedPlaces: {},
+    };
+    const safetyTimer = setTimeout(() => {
+      setProfile((cur) => cur ?? fallbackProfile);
+      setAuthReady(true);
+    }, 2000);
+    const unsub = subscribeProfile(
       authUser.uid,
       (p) => {
-        setProfile(p);
+        setProfile(p ?? fallbackProfile);
         setAuthReady(true);
       },
-      () => setAuthReady(true),
+      () => {
+        setProfile((cur) => cur ?? fallbackProfile);
+        setAuthReady(true);
+      },
     );
+    return () => {
+      clearTimeout(safetyTimer);
+      unsub();
+    };
   }, [authUser]);
 
   if (!isFirebaseConfigured) {
@@ -134,7 +171,7 @@ export default function HomePage() {
   }
 
   if (!authUser || !profile) {
-    return <AuthScreen authUser={authUser} />;
+    return <AuthScreen authUser={authUser} onProfileReady={setProfile} />;
   }
 
   return <CarpoolConsole user={profile} />;
@@ -142,7 +179,13 @@ export default function HomePage() {
 
 // ================================================================ Auth & College Verification
 
-function AuthScreen({ authUser }: { authUser: User | null }) {
+function AuthScreen({
+  authUser,
+  onProfileReady,
+}: {
+  authUser: User | null;
+  onProfileReady: (p: UserProfile) => void;
+}) {
   const [isSignup, setIsSignup] = useState(Boolean(authUser));
   const [email, setEmail] = useState(authUser?.email ?? '');
   const [password, setPassword] = useState('');
@@ -166,7 +209,26 @@ function AuthScreen({ authUser }: { authUser: User | null }) {
     try {
       const auth = getFirebaseAuth();
       if (!isSignup && !authUser) {
-        await signInWithEmailAndPassword(auth, email.trim(), password);
+        const signedIn = await signInWithEmailAndPassword(auth, email.trim(), password);
+        const existing = await getProfile(signedIn.user.uid);
+        onProfileReady(
+          existing ?? {
+            uid: signedIn.user.uid,
+            name: signedIn.user.displayName || email.trim().split('@')[0] || 'Student',
+            email: email.trim(),
+            phone: '',
+            role: 'rider',
+            gender: 'other',
+            college: 'Manipal University Jaipur',
+            collegeId: '',
+            branch: 'CSE',
+            year: '3rd Year',
+            vehicle: null,
+            verified: isAllowedEmail(email),
+            createdAt: Date.now(),
+            savedPlaces: {},
+          },
+        );
         return;
       }
 
@@ -180,7 +242,7 @@ function AuthScreen({ authUser }: { authUser: User | null }) {
         ? { user: authUser }
         : await createUserWithEmailAndPassword(auth, email.trim(), password);
 
-      await createProfile(cred.user.uid, {
+      const newProfileData = {
         name: name.trim() || 'Student',
         email: email.trim(),
         phone: phone.trim(),
@@ -199,11 +261,22 @@ function AuthScreen({ authUser }: { authUser: User | null }) {
                 seats: 4,
               }
             : null,
-      });
+      };
 
-      if (isAllowedEmail(email) && collegeId.trim().length >= 5) {
-        await markVerified(cred.user.uid);
+      await createProfile(cred.user.uid, newProfileData);
+
+      const verified = isAllowedEmail(email) && collegeId.trim().length >= 5;
+      if (verified) {
+        await markVerified(cred.user.uid).catch(() => {});
       }
+
+      onProfileReady({
+        ...newProfileData,
+        uid: cred.user.uid,
+        verified,
+        createdAt: Date.now(),
+        savedPlaces: {},
+      });
     } catch (err) {
       setError(describeFirebaseError(err));
     } finally {
